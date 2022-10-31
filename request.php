@@ -27,3 +27,8 @@ function refreshLastConnection(int $userID) {
     $stmt->bind_param("ss", $currentDate, $userID);
     $stmt->execute();
 }
+
+function createHabit() {
+    $con = openDB();
+    
+}
