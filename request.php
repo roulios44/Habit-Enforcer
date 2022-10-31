@@ -14,8 +14,8 @@ function openDB() {
 }
 
 function addUserDB(String $username, String $email, String $pwd) {
+    $currentDate = date("Y-m-d H:i:s");
     $con = openDB();
-    $stmt = $con->prepare("INSERT INTO user (username, email, password) VALUES (?,?,?)");
-    $stmt->bind_param("sss", $username, $email, $pwd);
-    $stmt->execute();
+    $stmt = $con->prepare("INSERT INTO user (username, email, password,lastConnection) VALUES (?,?,?,?)");
+    $stmt->bind_param("ssss", $username, $email, $pwd, $currentDate);
 }

@@ -19,10 +19,6 @@
     while ($row = mysqli_fetch_assoc($result)) {
         print_r($row);
     }
-
-    // $user = new User(3, "oui");
-    // echo $user->ID;
-    // echo $user->username;
     ?>
 </body>
 
