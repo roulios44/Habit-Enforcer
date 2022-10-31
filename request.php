@@ -19,3 +19,11 @@ function addUserDB(String $username, String $email, String $pwd) {
     $stmt->bind_param("sss", $username, $email, $pwd);
     $stmt->execute();
 }
+
+function refreshLastConnection(int $userID) {
+    $con = openDB();
+    $currentDate = date("Y-m-d H:i:s");
+    $stmt = $con->prepare("UPDATE user SET lastConnection = ? WHERE id = ?");
+    $stmt->bind_param("ss", $currentDate, $userID);
+    $stmt->execute();
+}
