@@ -21,10 +21,11 @@ function addUserDB(String $username, String $email, String $pwd) {
 }
 function alreadyExist(String $toSearch,String $table,String $row ) : bool{
     $db = openDB();
-    $sql = $db->prepare("SELECT count(*) as TOTAL FROM $table WHERE $row = ?");
+    $sql = $db->prepare("SELECT count(*) AS TOTAL FROM $table WHERE $row = ?");
     $sql->execute([$toSearch]);
-    $result = $sql->get_result();
+    $resultQuery = $sql->get_result();
+    $result = mysqli_fetch_assoc($resultQuery) ;
     mysqli_close($db) ;
-    if ($result->current_field==0)return false;
+    if ($result['TOTAL']==0)return false;
     return true;
 }

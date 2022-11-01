@@ -31,14 +31,18 @@ if(empty($username) || empty($password) || empty($mail)){
 <?php
 function register(){
     require("request.php") ;
+    $alreadyUse = false;
     $username = $_POST["username"];
     $password = $_POST["password"];
     $mail = $_POST["mail"];
     if ((alreadyExist($username,"user","username"))){
-        echo "username '$username' is already use, please chose another one " ;
-        if (alreadyExist($mail,"user","email"))echo "mail '$mail' is alreadu use for a account";
-    } else{
-        addUserDB($username,$mail,$password) ;
+        echo "username '$username' is already use, please chose another one <br>" ;
+        $alreadyUse = true;
     }
+    if (alreadyExist($mail,"user","email")){
+        echo "mail '$mail' is alreadu use for a account <br>";
+        $alreadyUse = true;
+    }
+    if(!$alreadyUse)addUserDB($username,$mail,$password);
 }
 ?>
