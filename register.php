@@ -3,7 +3,7 @@
 <?php include "head.php"?>
 <body>
     <?php include "header.php"?>
-    <div class="register">
+    <div class="form">
         <form action="register.php" method="POST">
             <p>Username: <input type="text" name="username"></p>
             <p>Password: <input type=text name = password></p>

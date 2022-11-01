@@ -5,7 +5,7 @@
     ?>
     <body>
         <?php include "header.php" ?>
-        <div class="connect">
+        <div class="form">
             <form action="" method="POST">
                 <p>Username: <input type="text" name="username"></p>
                 <p>Password: <input type="password" name ="password"></p>
