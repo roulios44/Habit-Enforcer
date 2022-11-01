@@ -29,3 +29,12 @@ function alreadyExist(String $toSearch,String $table,String $row ) : bool{
     if ($result['TOTAL']==0)return false;
     return true;
 }
+function checkPassword(String $username, String $password){
+    $db = openDB();
+    $sql = $db->prepare("SELECT password FROM user WHERE password = ?");
+    $sql->execute(([$username]));
+    $resultQuery = $sql->get_result();
+    $result = mysqli_fetch_assoc($resultQuery) ;
+    if($result["password"] == $password)return true ;
+    return false;
+}

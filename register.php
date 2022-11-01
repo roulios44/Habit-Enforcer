@@ -3,25 +3,17 @@
 <?php include "head.php"?>
 <body>
     <?php include "header.php"?>
+    <div class="register">
+        <form action="register.php" method="POST">
+            <p>Username: <input type="text" name="username"></p>
+            <p>Password: <input type=text name = password></p>
+            <p>E-mail Adress: <input type=text name = mail></p>
+            <p><input type="submit" name="submit" value="Create your profile !"></input></p>
+        </form>
+    </div>
+    <?php beginRegister() ;
+    ?>
 </body>
-<div class="register">
-    <form action="register.php" method="POST">
-        <p>Username: <input type="text" name="username"></p>
-        <p>Password: <input type=text name = password></p>
-        <p>E-mail Adress: <input type=text name = mail></p>
-        <p><input type="submit" name="submit" value="Create your profile !"></input></p>
-    </form>
-</div>
-<?php 
-$username = $_POST["username"];
-$password = $_POST["password"];
-$mail = $_POST["mail"];
-if(empty($username) || empty($password) || empty($mail)){
-    echo "Please fill all fields please\n";
-} else {
-    register();
-}
-?>
 <?php include "footer.php"?>
 </html>
 
@@ -29,6 +21,16 @@ if(empty($username) || empty($password) || empty($mail)){
 
 
 <?php
+function beginRegister(){
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+    $mail = $_POST["mail"];
+    if(empty($username) || empty($password) || empty($mail)){
+        echo "Please fill all fields please<br>";
+    } else {
+        register();
+    }
+}
 function register(){
     require("request.php") ;
     $alreadyUse = false;
