@@ -25,7 +25,6 @@ function alreadyExist(String $toSearch,String $table,String $row ) : bool{
     $sql->execute([$toSearch]);
     $resultQuery = $sql->get_result();
     $result = mysqli_fetch_assoc($resultQuery) ;
-    print_r($result['TOTAL']);
     mysqli_close($db) ;
     if ($result['TOTAL']==0)return false;
     return true;
@@ -55,8 +54,8 @@ function searchUser(String $usernameSearch):array | bool{
 }
 function dbGroupCreate(String $groupName, int $ownerID){
     $db = openDB();
-    $stmt = $db->prepare("INSERT INTO group (name,ownerID) VALUES (?,?)");
-    $stmt->bind_param("ss", $groupName, $ownerID);
-    $stmt->execute();
+    $sql = $db->prepare("INSERT INTO `group` (name,ownerID) VALUES (?,?)");
+    $sql->bind_param("si", $groupName, $ownerID);
+    $sql->execute();
     mysqli_close($db) ;
 }
