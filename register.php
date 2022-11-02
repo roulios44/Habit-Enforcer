@@ -11,8 +11,7 @@
             <p><input type="submit" name="submit" value="Create your profile !"></input></p>
         </form>
     </div>
-    <?php beginRegister() ;
-    ?>
+    <?php beginRegister() ;?>
 </body>
 <?php include "footer.php"?>
 </html>
