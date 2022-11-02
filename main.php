@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <?php include "header.php" ?>
+    <?php include "head.php" ?>
 <body>
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking
