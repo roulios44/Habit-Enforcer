@@ -30,6 +30,16 @@ function refreshLastConnection(int $userID) {
 
 function createHabit() {
     $con = openDB();
+    $description = $_GET["description"];
+    $difficulty = $_GET["difficulty"];
+    $color = $_GET["color"];
+    $start = date("Y-m-d H:i:s");
+    $time = $_GET["time"];
+    //TO DO
+    $userID = 1;
+    $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
+    $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
+    $stmt->execute();
 }
 
 function alreadyExist(String $toSearch,String $table,String $row ) : bool{

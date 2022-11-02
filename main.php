@@ -22,24 +22,25 @@
                     <form>
                     Description :<input type="text" id="description" name="description">
                     <div class="star-widget">Difficulty :
-                    <input type="radio" name="rate" id="rate-5" value="5">
-                    <label for="rate-5" class="fas fa-star"></label>
-                    <input type="radio" name="rate" id="rate-4" value="4">
-                    <label for="rate-4" class="fas fa-star"></label>
-                    <input type="radio" name="rate" id="rate-3" value="3">
-                    <label for="rate-3" class="fas fa-star"></label>
-                    <input type="radio" name="rate" id="rate-2" value="2">
-                    <label for="rate-2" class="fas fa-star"></label>
-                    <input type="radio" name="rate" id="rate-1" value="1">
-                    <label for="rate-1" class="fas fa-star"></label>
+                    <input type="radio" name="difficulty" id="difficulty-5" value="5">
+                    <label for="difficulty-5" class="fas fa-star"></label>
+                    <input type="radio" name="difficulty" id="difficulty-4" value="4">
+                    <label for="difficulty-4" class="fas fa-star"></label>
+                    <input type="radio" name="difficulty" id="difficulty-3" value="3">
+                    <label for="difficulty-3" class="fas fa-star"></label>
+                    <input type="radio" name="difficulty" id="difficulty-2" value="2">
+                    <label for="difficulty-2" class="fas fa-star"></label>
+                    <input type="radio" name="difficulty" id="difficulty-1" value="1">
+                    <label for="difficulty-1" class="fas fa-star"></label>
                     </div>
-                    Color :<input type="color" value="#333333" list="colors">
+                    Color :<input type="color" name="color" value="#333333" list="colors">
                     Period of time : <select name="time" id="time">
                     <option value="daily">Daily</option>
                     <option value="weekly">Weekly</option>
                     </select>
                     <input type="submit" id="submit" value = "Add habit">
                     </form>
+                    <?php createHabit() ?>
                 </div>
             </div>
         </div>
