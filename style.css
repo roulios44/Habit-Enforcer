@@ -15,7 +15,7 @@
 .html{
     width: 100%;
     height: 100%;
-    display: flex;
+	display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: flex-start;
@@ -39,6 +39,7 @@
 
 }
 body{
+	background-color: cadetblue;
     margin: 0;
     height: 100%;
     width: 100%;
@@ -90,4 +91,85 @@ body{
     justify-content: flex-start;
     align-items: stretch;
     align-content: stretch;
+}
+
+#allColumns{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-around;
+	align-items: stretch;
+	align-content: stretch;
+}
+.aColumn{
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: stretch;
+}
+.modal {
+	display: none;
+	position: fixed;
+	padding-top: 100px;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0,0,0,0.4);
+}
+  
+.modal-content {
+	background-color: #fefefe;
+	margin: auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
+}
+  
+.close {
+	color: #aaaaaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
+  
+.close:hover,
+.close:focus {
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
+}
+.star-widget {
+	display : inline-block;
+}
+.star-widget input {
+	display: none;
+}
+.star-widget label{
+  font-size: 18px;
+  color: #444;
+  float: right;
+  transition: all 0.2s ease;
+}
+input:not(:checked) ~ label:hover,
+input:not(:checked) ~ label:hover ~ label{
+  color: #fd4;
+}
+input:checked ~ label{
+  color: #fd4;
+}
+input#rate-2:checked ~ label{
+	color: rgb(255, 208, 0);
+  }
+input#rate-3:checked ~ label{
+	color: rgb(255, 153, 0);
+  }
+input#rate-4:checked ~ label{
+	color: rgb(255, 102, 0);
+  }
+input#rate-5:checked ~ label{
+  color: rgb(255, 0, 0);
 }
