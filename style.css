@@ -69,7 +69,8 @@ body{
     margin: 5%;
     align-self: center;
     box-shadow: 5px 2px 2px #9ba1e8;
-    border:solid yellow 2px;
+    border:solid yellow 5px;
+    border-radius: 5px;
     align-items: center;
     align-content: center;
     text-align: center;
@@ -82,18 +83,21 @@ body{
 }
 .form_name{
     background: transparent;
-    border: none;
-    color: yellow;
+    border-left: solid white 2px;
+    margin-left: 15%;
+    color : yellow;
 }
-.form_pass{
-    background: transparent;
-    border: none;
-    color: yellow;
+.username{
+    margin-right: 15px;
+    border-bottom:1px white solid;
+    margin-bottom: 15px;
 }
-.form_mail{
-    background: transparent;
-    border: none;
-    color: yellow;
+.password{
+    border-bottom:1px white solid;
+    margin-bottom: 15px;
+}
+.email{
+    margin-bottom: 15px;
 }
 .submit{
     background: green;
@@ -101,8 +105,11 @@ body{
     border: solid green 2px;
 }
 .input{
+    border-radius: 3px;
+    width: 500px;
+    height: 250px;
     background: black;
-    opacity: 0.6;
+    opacity: 0.8;
 }
 .leftHeader{
     height: 100%;

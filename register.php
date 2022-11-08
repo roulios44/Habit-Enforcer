@@ -6,10 +6,17 @@
     <div class="form">
         <form action="register.php" method="POST">
             <h2>Create a New Account</h2>
+            <br>
             <div class="input">
-                <p>Username | <input class="form_name" type="text" name="username"></p>
-                <p>Password | <input class="form_pass"type=text name = password></p>
-                <p>E-mail Adress | <input  class="form_mail" type=text name = mail></p>
+                <div class="username">
+                    <p>Username |<input class="form_name" type="text" name="username"></p>
+                </div>
+                <div class="password">
+                    <p>Password |<input class="form_name" type="password" name="password"></p>
+                </div>
+                <div class="email">
+                    <p> email |<input class="form_name" type="password" name="confirm_password"></p>
+                </div>
             </div>
         </form>
         <p><input class="submit" type="submit" name="submit" value="Create your profile !"></input></p>
