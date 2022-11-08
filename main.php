@@ -2,6 +2,7 @@
 <html lang="en">
     <?php include "head.php" ?>
 <body>
+    <?php include "header.php"?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking
             <?php
