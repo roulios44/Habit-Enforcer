@@ -5,11 +5,14 @@
     <?php include "header.php"?>
     <div class="form">
         <form action="register.php" method="POST">
-            <p>Username: <input type="text" name="username"></p>
-            <p>Password: <input type=text name = password></p>
-            <p>E-mail Adress: <input type=text name = mail></p>
-            <p><input type="submit" name="submit" value="Create your profile !"></input></p>
+            <h2>Create a New Account</h2>
+            <div class="input">
+                <p>Username | <input class="form_name" type="text" name="username"></p>
+                <p>Password | <input class="form_pass"type=text name = password></p>
+                <p>E-mail Adress | <input  class="form_mail" type=text name = mail></p>
+            </div>
         </form>
+        <p><input class="submit" type="submit" name="submit" value="Create your profile !"></input></p>
     </div>
     <?php beginRegister() ;?>
 </body>
