@@ -1,7 +1,4 @@
 <?php
-
-use function PHPSTORM_META\type;
-
 function openDB() {
     $servername = "localhost";
     $username = "root";

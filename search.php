@@ -43,15 +43,18 @@ function createUserResultCard(array $user){
     $inviteMessage = "<p><input type='submit' value='invite'></p>";
     if(alreadyInvited($id,$idGroup))$inviteMessage = "<p>Already invited</p>" ;
     echo ("<div class='userCard'>
-    $username
-    <form action='' method='POST'>
+     <p>$username</p>
+    <form method='POST'>
             $inviteMessage
             <input type='hidden' value=$id name='idUser'>
        </form>
     </div>") ;
 }
 function inviteUser(){
-
+    $var = $_POST["idUser"];
+    if(isset($_POST["idUser"])){
+        echo "hello $var";
+    }
 }
 
 ?>
