@@ -26,7 +26,7 @@ function BeginSignIn(){
     $username = $_POST["username"];
     $password = $_POST["password"];
     if(empty($username) || empty($password)){
-        echo "Please fill all fields please<br>";
+        echo "<p>Please fill all fields please</p><br>";
     } else {
         SignIn($username, $password);
     }
