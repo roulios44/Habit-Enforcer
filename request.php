@@ -32,16 +32,32 @@ function refreshLastConnection(int $userID) {
 
 function createHabit() {
     $con = openDB();
-    // $description = $_GET["description"];
-    // $difficulty = $_GET["difficulty"];
-    // $color = $_GET["color"];
-    // $start = date("Y-m-d H:i:s");
-    // $time = $_GET["time"];
-    // //TO DO
-    // $userID = 1;
-    // $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
-    // $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
-    // $stmt->execute();
+    if (isset($_POST["description"],$_POST["difficulty"],$_POST["color"],$_POST["time"])){
+        $description = $_POST["description"];
+        $difficulty = $_POST["difficulty"];
+        $color = $_POST["color"];
+        $start = date("Y-m-d H:i:s");
+        $time = $_POST["time"];
+        //TO DO set le userID au mec connecté
+        $userID = 1;
+        $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
+        $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
+        $stmt->execute();
+    }else {
+        echo "Please fill all the required fields to add an habit";
+    }
+}
+
+
+function checkIfDone(int $id) : bool{
+    $con = openDB();
+    $stmt = $con->prepare("SELECT isDone FROM habit WHERE id = ?");
+    $stmt->bind_param("s",$id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = mysqli_fetch_assoc($result)) {
+        return $row['isDone'];
+    }
 }
 
 function alreadyExist(String $toSearch,String $table,String $row ) : bool{
