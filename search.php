@@ -1,3 +1,4 @@
+<?php require "request.php" ?>
 <!DOCTYPE html>
 <html>
     <?php include "head.php"?>
@@ -23,13 +24,34 @@ function beginSearch(){
     }
 }
 function search(String $searchValue){
-    require "request.php";
     $userFound = searchUser($searchValue) ;
     if($userFound === false)echo "<p>No user with this pseudo has been found.</p>" ;
     else{
-        echo "<p>" ;
-        print_r($userFound);
-        echo "</p>" ;
+        echo "<div class='container'>" ;
+        for($i=0;$i<sizeOf($userFound);$i++){
+            createUserResultCard($userFound[$i]);
+        }
+        echo "</div>" ;
     }
 }
+
+function createUserResultCard(array $user){
+    //TODO remove idGroup by the current User idGroup (if he get one) else dont echo invite button
+    $idGroup = 1;
+    $username = $user["username"] ;
+    $id = $user["id"];
+    $inviteMessage = "<p><input type='submit' value='invite'></p>";
+    if(alreadyInvited($id,$idGroup))$inviteMessage = "<p>Already invited</p>" ;
+    echo ("<div class='userCard'>
+    $username
+    <form action='' method='POST'>
+            $inviteMessage
+            <input type='hidden' value=$id name='idUser'>
+       </form>
+    </div>") ;
+}
+function inviteUser(){
+
+}
+
 ?>

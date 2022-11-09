@@ -1,3 +1,4 @@
+<?php require "request.php"?>
 <!DOCTYPE html>
 <html lang="en">
     <?php
@@ -32,13 +33,12 @@ function BeginSignIn(){
 }
 
 function SignIn(String $username, String $password){
-    require "request.php";
     if (!alreadyExist($username,"user", "username"))echo "This username is unknow of our website, you can create a account with this one";
     else {
         if (checkPassword($username,$password)){
-            echo "good password" ;
+            echo "<p>good password</p>" ;
         } else {
-            echo "Wrong password, try again" ;
+            echo "<p>Wrong password, try again</p>" ;
         }
     }
 }

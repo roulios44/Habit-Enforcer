@@ -1,4 +1,7 @@
 <?php
+
+use function PHPSTORM_META\type;
+
 function openDB() {
     $servername = "localhost";
     $username = "root";
@@ -18,6 +21,7 @@ function addUserDB(String $username, String $email, String $pwd) {
     $stmt = $con->prepare("INSERT INTO user (username, email, password,lastConnection) VALUES (?,?,?,?)");
     $stmt->bind_param("ssss", $username, $email, $pwd, $currentDate);
     $stmt->execute();
+    mysqli_close($con) ;
 }
 
 function refreshLastConnection(int $userID) {
@@ -26,20 +30,21 @@ function refreshLastConnection(int $userID) {
     $stmt = $con->prepare("UPDATE user SET lastConnection = ? WHERE id = ?");
     $stmt->bind_param("ss", $currentDate, $userID);
     $stmt->execute();
+    mysqli_close($con) ;
 }
 
 function createHabit() {
     $con = openDB();
-    $description = $_GET["description"];
-    $difficulty = $_GET["difficulty"];
-    $color = $_GET["color"];
-    $start = date("Y-m-d H:i:s");
-    $time = $_GET["time"];
-    //TO DO
-    $userID = 1;
-    $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
-    $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
-    $stmt->execute();
+    // $description = $_GET["description"];
+    // $difficulty = $_GET["difficulty"];
+    // $color = $_GET["color"];
+    // $start = date("Y-m-d H:i:s");
+    // $time = $_GET["time"];
+    // //TO DO
+    // $userID = 1;
+    // $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
+    // $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
+    // $stmt->execute();
 }
 
 function alreadyExist(String $toSearch,String $table,String $row ) : bool{
@@ -64,16 +69,19 @@ function checkPassword(String $username, String $password){
 }
 function searchUser(String $usernameSearch):array | bool{
     $db = openDB();
-    $sql = $db->prepare("SELECT username,id FROM user WHERE username = ?");
-    $sql->execute(([$usernameSearch]));
+    $sql = $db->prepare("SELECT username,id FROM user WHERE username LIKE ?");
+    $sql->execute((["%$usernameSearch%"]));
     $resultQuery = $sql->get_result();
     if ($resultQuery->num_rows<=0){
         mysqli_close($db) ;
         return false;
     }
-    $result = mysqli_fetch_assoc($resultQuery) ;
+    $resultArray = [] ;
+    while($row = $resultQuery->fetch_assoc()){
+        array_push($resultArray, $row) ;
+    }
     mysqli_close($db) ;
-    return $result;
+    return $resultArray;
 }
 function dbGroupCreate(String $groupName, int $ownerID){
     $db = openDB();
@@ -81,4 +89,22 @@ function dbGroupCreate(String $groupName, int $ownerID){
     $sql->bind_param("si", $groupName, $ownerID);
     $sql->execute();
     mysqli_close($db) ;
+}
+function completeTask(int $done, int $id) {
+    $con = openDB();
+    $stmt = $con->prepare("UPDATE habit SET isDone = ? WHERE id = ?");
+    $stmt->bind_param("ss",$done, $id);
+    $stmt->execute();
+    mysqli_close($con) ;
+}
+
+function alreadyInvited(int $id,int $groupId){
+    $db = openDB();
+    $sql = $db->prepare("SELECT inviteGroup FROM user WHERE id = ?");
+    $sql->execute(([$id]));
+    $resultQuery = $sql->get_result();
+    $arrayGroupInvite = json_decode($resultQuery->fetch_assoc()['inviteGroup']);
+    if (is_null($arrayGroupInvite))return false;
+    if (in_array($groupId,$arrayGroupInvite))return true;
+    return false;
 }
