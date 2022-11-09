@@ -26,7 +26,7 @@
 .header{
     width: 100%;
     height: 20%;
-    background-color: orange;
+    background-color: #65AB96;
     align-items: center;
     align-content: center;
     text-align: center;
@@ -39,7 +39,7 @@
 
 }
 body{
-	background-color: cadetblue;
+	background-color: #23785E;
     margin: 0;
     height: 100%;
     width: 100%;
@@ -54,6 +54,7 @@ body{
     align-content: stretch;
 }
 .form{
+  background-color: beige;
     border-radius: 5px;
     padding: 3%;
     margin: 3%;
@@ -82,7 +83,7 @@ body{
     align-content: stretch;
 }
 .rightHeader{
-    background-color: blue;
+    background-color: #9ADFA3;
     height: 100%;
     width: 40%;
     display: flex;
@@ -172,4 +173,27 @@ input#difficulty-4:checked ~ label{
   }
 input#difficulty-5:checked ~ label{
   color: rgb(255, 0, 0);
+}
+.userCard{
+  margin: 25px;
+  display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+  min-width: 25%;
+  min-height: 100%;
+  align-items: center;
+  border: solid black;
+  background-color: red;
+}
+.container{
+  margin: 20px;
+  height: 100%;
+  width: 100%;
+  display:flex;
+  flex-wrap:wrap;
+  flex-direction: row;
+  position:relative;
+  justify-content: center;
+  align-items: center;
 }

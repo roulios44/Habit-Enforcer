@@ -1,4 +1,5 @@
 <?php
+
 function openDB() {
     $servername = "localhost";
     $username = "root";
@@ -18,6 +19,7 @@ function addUserDB(String $username, String $email, String $pwd) {
     $stmt = $con->prepare("INSERT INTO user (username, email, password,lastConnection) VALUES (?,?,?,?)");
     $stmt->bind_param("ssss", $username, $email, $pwd, $currentDate);
     $stmt->execute();
+    mysqli_close($con) ;
 }
 
 function refreshLastConnection(int $userID) {
@@ -26,6 +28,7 @@ function refreshLastConnection(int $userID) {
     $stmt = $con->prepare("UPDATE user SET lastConnection = ? WHERE id = ?");
     $stmt->bind_param("ss", $currentDate, $userID);
     $stmt->execute();
+    mysqli_close($con) ;
 }
 
 function createHabit() {
@@ -36,21 +39,13 @@ function createHabit() {
         $color = $_POST["color"];
         $start = date("Y-m-d H:i:s");
         $time = $_POST["time"];
-        //TO DO set le userID au mec connecté
-        $userID = 1;
+        $userID = $_SESSION["id"];
         $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
         $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
         $stmt->execute();
     }else {
         echo "Please fill all the required fields to add an habit";
     }
-}
-
-function completeTask(int $done, int $id) {
-    $con = openDB();
-    $stmt = $con->prepare("UPDATE habit SET isDone = ? WHERE id = ?");
-    $stmt->bind_param("ss",$done, $id);
-    $stmt->execute();
 }
 
 function checkIfDone(int $id) : bool{
@@ -67,7 +62,8 @@ function checkIfDone(int $id) : bool{
 function alreadyExist(String $toSearch,String $table,String $row ) : bool{
     $db = openDB();
     $sql = $db->prepare("SELECT count(*) AS TOTAL FROM `$table` WHERE $row = ?");
-    $sql->execute([$toSearch]);
+    $sql->bind_param("s",$toSearch);
+    $sql->execute();
     $resultQuery = $sql->get_result();
     $result = mysqli_fetch_assoc($resultQuery) ;
     mysqli_close($db) ;
@@ -76,8 +72,9 @@ function alreadyExist(String $toSearch,String $table,String $row ) : bool{
 }
 function checkPassword(String $username, String $password){
     $db = openDB();
-    $sql = $db->prepare("SELECT password FROM user WHERE password = ?");
-    $sql->execute(([$username]));
+    $sql = $db->prepare("SELECT password FROM user WHERE username = ?");
+    $sql->bind_param("s",$username);
+    $sql->execute();
     $resultQuery = $sql->get_result();
     $result = mysqli_fetch_assoc($resultQuery) ;
     mysqli_close($db) ;
@@ -86,16 +83,19 @@ function checkPassword(String $username, String $password){
 }
 function searchUser(String $usernameSearch):array | bool{
     $db = openDB();
-    $sql = $db->prepare("SELECT username,id FROM user WHERE username = ?");
-    $sql->execute(([$usernameSearch]));
+    $sql = $db->prepare("SELECT username,id FROM user WHERE username LIKE ?");
+    $sql->execute((["%$usernameSearch%"]));
     $resultQuery = $sql->get_result();
     if ($resultQuery->num_rows<=0){
         mysqli_close($db) ;
         return false;
     }
-    $result = mysqli_fetch_assoc($resultQuery) ;
+    $resultArray = [] ;
+    while($row = $resultQuery->fetch_assoc()){
+        array_push($resultArray, $row) ;
+    }
     mysqli_close($db) ;
-    return $result;
+    return $resultArray;
 }
 function dbGroupCreate(String $groupName, int $ownerID){
     $db = openDB();
@@ -103,4 +103,34 @@ function dbGroupCreate(String $groupName, int $ownerID){
     $sql->bind_param("si", $groupName, $ownerID);
     $sql->execute();
     mysqli_close($db) ;
+}
+
+function completeTask(int $done, int $id) {
+    $con = openDB();
+    $stmt = $con->prepare("UPDATE habit SET isDone = ? WHERE id = ?");
+    $stmt->bind_param("ss",$done, $id);
+    $stmt->execute();
+    mysqli_close($con) ;
+}
+
+function alreadyInvited(int $id,int $groupId){
+    $db = openDB();
+    $sql = $db->prepare("SELECT inviteGroup FROM user WHERE id = ?");
+    $sql->execute(([$id]));
+    $resultQuery = $sql->get_result();
+    $arrayGroupInvite = json_decode($resultQuery->fetch_assoc()['inviteGroup']);
+    if (is_null($arrayGroupInvite))return false;
+    if (in_array($groupId,$arrayGroupInvite))return true;
+    return false;
+}
+
+function getID(string $username) : int {
+    $db = openDB();
+    $stmt = $db->prepare("SELECT id FROM user WHERE username = ?");
+    $stmt->bind_param("s",$username);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    while($row = $resultQuery->fetch_assoc()){
+        return $row['id'];
+    }
 }
