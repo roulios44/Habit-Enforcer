@@ -46,6 +46,9 @@
                 </div>
             </div>
             <?php
+
+            ?>
+            <?php
                 $con = openDB();
                 $query = "SELECT description, id FROM habit";
                 $result = mysqli_query($con, $query);
@@ -55,6 +58,10 @@
                 echo "<div id=allHabits>";
                 while ($row = mysqli_fetch_assoc($result)) {
                     array_push($IDArray, $row['id']);
+                    if (isset($_POST['changeHabit'])) {
+                        $isDone = (isset($_POST["isDone_".$row['id']]) ? '1' : '0');
+                        completeTask($isDone,$row['id']);
+                    }
                     $done = checkIfDone($row['id']);
                     $sayDone = "Done";
                     $check = "";
@@ -62,24 +69,13 @@
                         $check = "checked";
                         $sayDone = "Undone";
                     }
-                    echo "<div> <input type=hidden name=hidDone_".$row['id']." value=".$sayDone." ><input type=checkbox onclick=this.form.submit() name=isDone id=isDone value=".$row['id']." ".$check.">".$row['description']." </div>";
+                    echo "<div> <input type=checkbox name=isDone_".$row['id']." id=isDone_".$row['id']." value=done ".$check.">".$row['description']." </div>";
                 }
+                echo "<input type=submit name=changeHabit>";
                 echo "</div>";
                 echo "</form>";
             ?>
-            <?php
-                foreach ($IDArray as $id) {
-                    echo $_POST["hidDone_$id"];
-                    if(isset($_POST["hidDone_$id"])){
-                        if ($_POST["hidDone_$id"]== "Done") {
-                            completeTask(1,$id);
-                        }
-                        if ($_POST["hidDone_$id"]== "Undone") {
-                            completeTask(0, $id);
-                        }
-                    }
-                }
-            ?>
+            <div id ="updateHabit"> </div>
         </div>
         <div id="toDo" name="toDo" class="toDo" class="aColumn">To Do
         <?php
