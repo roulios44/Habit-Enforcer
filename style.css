@@ -38,7 +38,7 @@
   align-content: stretch;
 }
 body{
-	background-color: cadetblue;
+	background-color: #23785E;
     margin: 0;
     height: 100%;
     width: 100%;
@@ -53,6 +53,7 @@ body{
     align-content: stretch;
 }
 .form{
+  background-color: beige;
     border-radius: 5px;
     padding: 3%;
     margin: 3%;
@@ -81,7 +82,7 @@ body{
     align-content: stretch;
 }
 .rightHeader{
-    background-color: red;
+    background-color: #9ADFA3;
     height: 100%;
     width: 40%;
     display: flex;

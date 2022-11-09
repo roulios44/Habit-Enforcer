@@ -1,13 +1,16 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
     <?php include "head.php" ?>
 <body>
     <?php include "header.php"?>
+    <?= $_SESSION["id"];?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking
             <?php
                 include 'request.php';
                 $con = openDB();
+                //TODO change for groups in score order
                 $query = "SELECT username FROM user";
                 $result = mysqli_query($con, $query);
                 while ($row = mysqli_fetch_assoc($result)) {
@@ -41,7 +44,6 @@
                     </select>
                     <input type="submit" id="submit" value = "Add habit">
                     </form>
-                    <!-- TODO si le mec veut add une habit pas complete, lui indiquer !-->
                     <?php createHabit() ?>
                 </div>
             </div>
@@ -50,7 +52,7 @@
             ?>
             <?php
                 $con = openDB();
-                $query = "SELECT description, id FROM habit";
+                $query = "SELECT description, id FROM habit WHERE userID = $_SESSION[id]";
                 $result = mysqli_query($con, $query);
                 $nbRows = mysqli_num_rows($result);
                 $IDArray = [];
@@ -80,7 +82,7 @@
         <div id="toDo" name="toDo" class="toDo" class="aColumn">To Do
         <?php
                 $con = openDB();
-                $query = "SELECT description FROM habit WHERE isDone = False";
+                $query = "SELECT description FROM habit WHERE isDone = False and userID = $_SESSION[id]";
                 $result = mysqli_query($con, $query);
                 while ($row = mysqli_fetch_assoc($result)) {
                     echo "<div>".$row['description']."</div>";
