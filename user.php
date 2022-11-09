@@ -17,4 +17,13 @@ class User{
         $this->hasAddHabit = $hasAddHabit;
     }
 }
+
+class loggedUser extends User{
+    public String $username;
+    public int $groupID;
+    function __construct(String $username, int|null $groupID) {
+        $this->username = $username;
+        $this->groupID = $groupID;
+    }
+}
 ?>
