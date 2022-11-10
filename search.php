@@ -6,7 +6,7 @@ session_start() ?>
     <?php include "head.php"?>
     <?php include "header.php"?>
     <body>
-        <?php  echo $_SESSION["id"]?>
+        <?php  echo $_SESSION["groupID"]?>
         <div class="search">
             <form action="" method="POST">
                 <p>Search a user: <input type="text" name="searchUser"></p>
@@ -40,24 +40,28 @@ function search(String $searchValue){
 
 function createUserResultCard(array $user){
     //TODO remove idGroup by the current User idGroup (if he get one) else dont echo invite button
-    $idGroup = 1;
+
     $username = $user["username"] ;
     $id = $user["id"];
-    $inviteMessage = "<p><input type='submit' value='invite'></p>";
-    if(alreadyInvited($id,$idGroup))$inviteMessage = "<p>Already invited</p>" ;
+    $inviteMessage = getInviteMessage($id);
     echo ("<div class='userCard'>
      <p>$username</p>
-    <form method='POST'>
+    <form method='POST' action='http://localhost/Habit-Enforcer/test.php'>
             $inviteMessage
             <input type='hidden' value=$id name='idUser'>
        </form>
     </div>") ;
 }
 function inviteUser(){
-    $var = $_POST["idUser"];
-    if(isset($_POST["idUser"])){
-        echo "hello $var";
+    if(!empty($_POST["idUser"])){
+        addUserGroup($_SESSION["groupID"], $_POST["idUser"]);
     }
 }
 
+function getInviteMessage(int $userID) : string{
+    if(getGroupID($userID))return "<p>Already in a groupe</p>" ;
+    else if(alreadyInvited($userID,$_SESSION["groupID"]))return "<p>Already invited</p>" ;
+    else if (is_null($_SESSION["groupID"]))return "<p>You are not in a group, join one to invite a user to a group</p>" ;
+    return "<p><input type='submit' value='invite'></p>";
+}
 ?>

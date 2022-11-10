@@ -121,6 +121,7 @@ function alreadyInvited(int $id,int $groupId){
     $sql->execute(([$id]));
     $resultQuery = $sql->get_result();
     $arrayGroupInvite = json_decode($resultQuery->fetch_assoc()['inviteGroup']);
+    mysqli_close($db);
     if (is_null($arrayGroupInvite))return false;
     if (in_array($groupId,$arrayGroupInvite))return true;
     return false;
@@ -153,18 +154,56 @@ function addUserGroup(int $groupID, int $userID){
     $stmt->bind_param("ii", $groupID, $userID);
     $stmt->execute();
     mysqli_close($con) ;
+    updateGroupMembers($groupID,$userID) ;
 }
 
 function getMembersGroup(int $idGroup) : array{
-    $idGroup = 2;
     $db = openDB();
     $stmt = $db->prepare("SELECT members FROM `group` WHERE id = ?");
     $stmt->bind_param("i",$idGroup);
     $stmt->execute();
     $resultQuery = $stmt->get_result();
-    $idArray = [] ;
-    while ($row = mysqli_fetch_assoc($resultQuery)){
-        array_push($idArray, $row);
-    }
+    $idArray = json_decode(mysqli_fetch_assoc($resultQuery)["members"]);
     return $idArray ;
+}
+
+function updateGroupMembers(int $groupID, int $userID){
+    $groupMember = getMembersGroup($groupID);
+    if (!in_array($userID,$groupMember))array_push($groupMember, $userID);
+    $con = openDB();
+    $stmt = $con->prepare("UPDATE `group` SET members = ? WHERE id = ?");
+    $stmt->bind_param("si", json_encode($groupMember) , $groupID);
+    $stmt->execute();
+    mysqli_close($con) ;
+}
+
+function getinvite(int $id) : array{
+    $db = openDB();
+    $stmt = $db->prepare("SELECT inviteGroup FROM user WHERE id = ?");
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    $inviteArray = json_decode(mysqli_fetch_assoc($resultQuery)["inviteGroup"]);
+    mysqli_close($db);
+    return $inviteArray;
+}
+
+function getGroupInfo(int $groupID) : array{
+    $db = openDB();
+    $stmt = $db->prepare("SELECT name,ownerID,members FROM `group` WHERE id = ?");
+    $stmt->bind_param("i",$groupID);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    mysqli_close($db);
+    return mysqli_fetch_assoc($resultQuery);
+}
+
+function getUsername(int $userID) : string{
+    $db = openDB();
+    $stmt = $db->prepare("SELECT username FROM user WHERE id = ?");
+    $stmt->bind_param("i",$userID);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    mysqli_close($db);
+    return mysqli_fetch_assoc($resultQuery)["username"];
 }

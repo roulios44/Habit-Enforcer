@@ -1,17 +1,21 @@
-<?php 
-require "request.php";
-session_start() ;
-?>
+<?php require "request.php";
+session_start() ?>
+
 <!DOCTYPE html>
-<html lang="en">
-    <?php require "head.php" ?>
+<html>
+    <?php include "head.php"?>
+    <?php include "header.php"?>
     <body>
-    <?php require "header.php" ?>
         <?php 
-        echo $_SESSION["id"] ;
-        $test = getMembersGroup($_SESSION["groupID"]);
-        print_r($test) ;
-        ?>
-</body>
-<?php require "footer.php" ?>
+        inviteUser();?>
+    </body>
+    <?php include "footer.php"?>
 </html>
+
+<?php
+function inviteUser(){
+    if(($_POST["idUser"])){
+        addUserGroup($_SESSION["groupID"], $_POST["idUser"]); 
+    }
+}
+?>
