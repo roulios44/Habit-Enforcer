@@ -39,6 +39,7 @@ function SignIn(String $username, String $password){
             session_start();
             $_SESSION["username"] = $username;
             $_SESSION["id"] = getID($username);
+            $_SESSION["groupID"] = getGroupID($_SESSION["id"]) ;
             header('Location: main.php');
         } else {
             echo "<p>Wrong password, try again</p>" ;

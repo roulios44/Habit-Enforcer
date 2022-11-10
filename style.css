@@ -186,7 +186,6 @@ input#difficulty-5:checked ~ label{
   background-color: red;
 }
 .container{
-  margin: 20px;
   height: 100%;
   width: 100%;
   display:flex;

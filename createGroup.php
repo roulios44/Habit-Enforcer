@@ -1,3 +1,8 @@
+<?php
+require "request.php";
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <?php include "head.php" ?>
@@ -24,11 +29,10 @@ function beginGroupCreation(){
 }
 
 function createGroup(String $groupName){
-    include "request.php" ;
     if (alreadyExist($groupName,"group","name")){
         echo "this group name already exist";
     } else {
-        dbGroupCreate($groupName,1);
+        dbGroupCreate($groupName,$_SESSION["id"]);
     }
 }
 

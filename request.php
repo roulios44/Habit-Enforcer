@@ -97,11 +97,14 @@ function searchUser(String $usernameSearch):array | bool{
     return $resultArray;
 }
 function dbGroupCreate(String $groupName, int $ownerID){
+    $arrayMembers = json_encode([$ownerID]) ;
     $db = openDB();
-    $sql = $db->prepare("INSERT INTO `group` (name,ownerID) VALUES (?,?)");
-    $sql->bind_param("si", $groupName, $ownerID);
+    $sql = $db->prepare("INSERT INTO `group` (name,ownerID,members) VALUES (?,?,?)");
+    $sql->bind_param("sis", $groupName, $ownerID,$arrayMembers);
     $sql->execute();
+    $groupID = $db->insert_id;
     mysqli_close($db) ;
+    addUserGroup($groupID, $ownerID) ;
 }
 
 function completeTask(int $done, int $id) {
@@ -129,7 +132,39 @@ function getID(string $username) : int {
     $stmt->bind_param("s",$username);
     $stmt->execute();
     $resultQuery = $stmt->get_result();
-    while($row = $resultQuery->fetch_assoc()){
-        return $row['id'];
+    mysqli_close($db);
+    return $resultQuery->fetch_assoc()["id"];
+}
+
+function getGroupID(int $id){
+    $db = openDB();
+    $stmt = $db->prepare("SELECT groupID FROM user WHERE id = ?");
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    mysqli_close($db);
+    return $resultQuery->fetch_assoc()["groupID"];
+}
+
+function addUserGroup(int $groupID, int $userID){
+    $con = openDB();
+    // setting inviteGroup to [] to remove all invite (if he accept to be in a group, he can't go to another one)
+    $stmt = $con->prepare("UPDATE user SET groupID = ?, inviteGroup = DEFAULT WHERE id = ?");
+    $stmt->bind_param("ii", $groupID, $userID);
+    $stmt->execute();
+    mysqli_close($con) ;
+}
+
+function getMembersGroup(int $idGroup) : array{
+    $idGroup = 2;
+    $db = openDB();
+    $stmt = $db->prepare("SELECT members FROM `group` WHERE id = ?");
+    $stmt->bind_param("i",$idGroup);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    $idArray = [] ;
+    while ($row = mysqli_fetch_assoc($resultQuery)){
+        array_push($idArray, $row);
     }
+    return $idArray ;
 }

@@ -1,9 +1,12 @@
-<?php require "request.php" ?>
+<?php require "request.php";
+session_start() ?>
+
 <!DOCTYPE html>
 <html>
     <?php include "head.php"?>
     <?php include "header.php"?>
     <body>
+        <?php  echo $_SESSION["id"]?>
         <div class="search">
             <form action="" method="POST">
                 <p>Search a user: <input type="text" name="searchUser"></p>
