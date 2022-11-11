@@ -27,8 +27,18 @@ function generateInviteBox(int $groupID){
     echo "
     <div class=userCard>
     <h1>" .$infoGroup["name"] ."</h1><br>
-    <p>owner : $ownerName</p>
+    <p>owner : $ownerName</p><br>
+    <p>number of members : ".sizeof(json_decode($infoGroup["members"]))."</p>
+    <form method='POST'>
+        <p><input type='submit' value='Join this group'></p>
+        <input type='hidden' value=$groupID name='groupID'>
+    </form>
     </div>
     ";
+    acceptInvite();
+}
+
+function acceptInvite(){
+    if ($_POST["groupID"])addUserGroup($_POST["groupID"],$_SESSION["id"]);
 }
 ?>
