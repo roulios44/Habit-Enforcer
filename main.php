@@ -4,7 +4,6 @@
     <?php include "head.php" ?>
 <body>
     <?php include "header.php"?>
-    <?php echo gettype($_SESSION["groupID"]);?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking
             <?php

@@ -207,3 +207,11 @@ function getUsername(int $userID) : string{
     mysqli_close($db);
     return mysqli_fetch_assoc($resultQuery)["username"];
 }
+function getInDB(string $toSelect, string $table, string $rowToSearch, string|int $condition){
+    $db = openDB();
+    $sql = $db->prepare("SELECT $toSelect FROM `$table` WHERE $rowToSearch = ?");
+    $sql->execute([$condition]);
+    $resultQuery = $sql->get_result();
+    mysqli_close($db) ;
+    return mysqli_fetch_assoc($resultQuery) ;
+}
