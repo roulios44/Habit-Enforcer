@@ -4,11 +4,10 @@
     <?php include "head.php" ?>
 <body>
     <?php include "header.php"?>
-    <?= $_SESSION["id"];?>
+    <?php include 'request.php';?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking
             <?php
-                include 'request.php';
                 $con = openDB();
                 //TODO change for groups in score order
                 $query = "SELECT username FROM user";
@@ -77,7 +76,6 @@
                 echo "</div>";
                 echo "</form>";
             ?>
-            <div id ="updateHabit"> </div>
         </div>
         <div id="toDo" name="toDo" class="toDo" class="aColumn">To Do
         <?php
@@ -90,7 +88,19 @@
             ?>
         </div>
         <div id="group" name="group" class="group" class="aColumn">Group
-            </div>
+            <div id=totalScore> Total score = <?= getScore($_SESSION["id"]);?> </div>
+            <?php 
+                $con = openDB();
+                $groupID = getGroupID($_SESSION["id"]);
+                $stmt = $con->prepare("SELECT username FROM user WHERE groupID = ?");
+                $stmt->bind_param("s",$groupID);
+                $stmt->execute();
+                $result2 = $stmt->get_result();
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "<div>".$row['username']."</div>";
+                }
+            ?>
+        </div>
     </div>
 <script>
     var modal = document.getElementById("modal");

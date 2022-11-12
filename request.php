@@ -107,10 +107,42 @@ function dbGroupCreate(String $groupName, int $ownerID){
 
 function completeTask(int $done, int $id) {
     $con = openDB();
+    $stmt = $con->prepare("SELECT isDone, userID, difficulty FROM habit WHERE id = ?");
+    $stmt->bind_param("s",$id);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    $row = $resultQuery->fetch_assoc();
     $stmt = $con->prepare("UPDATE habit SET isDone = ? WHERE id = ?");
     $stmt->bind_param("ss",$done, $id);
     $stmt->execute();
+    if ($row['isDone'] != $done) {
+        $score = defineScoreUpdate($done, $row['difficulty']);
+        $stmt = $con->prepare("UPDATE user SET score = score+? WHERE id = ?");
+        $stmt->bind_param("ss",$score, $row['userID']);
+        $stmt->execute();
+    }
     mysqli_close($con) ;
+}
+
+function getScore($id) : int {
+    $con = openDB();
+    $stmt = $con->prepare("SELECT score FROM user WHERE id = ?");
+    $stmt->bind_param("s",$id);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    $row = $resultQuery->fetch_assoc();
+    return $row["score"];
+    mysqli_close($con) ;
+}
+
+function defineScoreUpdate($done, $difficulty){
+    $arr = [10,20,30,40,50];
+    if ($done == 1) {
+        return $arr[$difficulty-1];
+    } else {
+        $reverse = array_reverse($arr);
+        return -$reverse[$difficulty-1];
+    }
 }
 
 function alreadyInvited(int $id,int $groupId){
@@ -130,7 +162,15 @@ function getID(string $username) : int {
     $stmt->bind_param("s",$username);
     $stmt->execute();
     $resultQuery = $stmt->get_result();
-    while($row = $resultQuery->fetch_assoc()){
-        return $row['id'];
-    }
+    $row = $resultQuery->fetch_assoc();
+    return $row['id'];
+}
+
+function getGroupID(int $userID) : int|null{
+    $con = openDB();
+    $stmt = $con->prepare("SELECT groupID FROM user WHERE id = ?");
+    $stmt->bind_param("s",$userID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return mysqli_fetch_assoc($result)['groupID'];
 }
