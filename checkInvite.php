@@ -23,7 +23,7 @@ function showAllInvite(){
 
 function generateInviteBox(int $groupID){
     $infoGroup = getGroupInfo($groupID) ;
-    $ownerName = getInDB("username","user","id",$infoGroup["ownerID"]) ;
+    $ownerName = getInDB("username","user","id",$infoGroup["ownerID"])["username"] ;
     echo "
     <div class=userCard>
     <h1>" .$infoGroup["name"] ."</h1><br>
