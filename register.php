@@ -41,7 +41,7 @@ function register(){
         $alreadyUse = true;
     }
     if (alreadyExist($mail,"user","email")){
-        echo "mail '$mail' is alreadu use for a account <br>";
+        echo "mail '$mail' is already use for a account <br>";
         $alreadyUse = true;
     }
     if(!$alreadyUse){

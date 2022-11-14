@@ -13,10 +13,11 @@ function openDB() {
 }
 
 function addUserDB(String $username, String $email, String $pwd) {
+    $hashPassword = password_hash($pwd,PASSWORD_DEFAULT);
     $currentDate = date("Y-m-d");
     $con = openDB();
     $stmt = $con->prepare("INSERT INTO user (username, email, password,lastConnection) VALUES (?,?,?,?)");
-    $stmt->bind_param("ssss", $username, $email, $pwd, $currentDate);
+    $stmt->bind_param("ssss", $username, $email, $hashPassword, $currentDate);
     $stmt->execute();
     mysqli_close($con) ;
 }
@@ -77,7 +78,11 @@ function checkPassword(String $username, String $password){
     $resultQuery = $sql->get_result();
     $result = mysqli_fetch_assoc($resultQuery) ;
     mysqli_close($db) ;
-    if($result["password"] == $password)return true ;
+    $verify = password_verify($password, $result["password"]) ;
+    echo $verify ;
+    if($verify)echo "true" ;
+    else echo "false" ;
+    if($verify)return true ;
     return false;
 }
 function searchUser(String $usernameSearch):array | bool{
