@@ -131,17 +131,6 @@ function completeTask(int $done, int $id) {
     mysqli_close($con) ;
 }
 
-function getScore($id) : int {
-    $con = openDB();
-    $stmt = $con->prepare("SELECT score FROM user WHERE id = ?");
-    $stmt->bind_param("s",$id);
-    $stmt->execute();
-    $resultQuery = $stmt->get_result();
-    $row = $resultQuery->fetch_assoc();
-    return $row["score"];
-    mysqli_close($con) ;
-}
-
 function defineScoreUpdate($done, $difficulty, $situation){
     $arr = [10,20,30,40,50];
     if ($done == 1 && $situation == "instantManaging") {
@@ -166,25 +155,6 @@ function alreadyInvited(int $id,int $groupId){
     return false;
 }
 
-function getID(string $username) : int {
-    $db = openDB();
-    $stmt = $db->prepare("SELECT id FROM user WHERE username = ?");
-    $stmt->bind_param("s",$username);
-    $stmt->execute();
-    $resultQuery = $stmt->get_result();
-    $row = $resultQuery->fetch_assoc();
-    return $row['id'];
-}
-
-function getGroupID(int $userID) : int|null{
-    $con = openDB();
-    $stmt = $con->prepare("SELECT groupID FROM user WHERE id = ?");
-    $stmt->bind_param("s",$userID);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return mysqli_fetch_assoc($result)['groupID'];
-}
-
 function addUserGroup(int $groupID, int $userID){
     $con = openDB();
     // setting inviteGroup to [] to remove all invite (if he accept to be in a group, he can't go to another one)
@@ -195,35 +165,14 @@ function addUserGroup(int $groupID, int $userID){
     updateGroupMembers($groupID,$userID) ;
 }
 
-function getMembersGroup(int $idGroup) : array{
-    $db = openDB();
-    $stmt = $db->prepare("SELECT members FROM `group` WHERE id = ?");
-    $stmt->bind_param("i",$idGroup);
-    $stmt->execute();
-    $resultQuery = $stmt->get_result();
-    $idArray = json_decode(mysqli_fetch_assoc($resultQuery)["members"]);
-    return $idArray ;
-}
-
 function updateGroupMembers(int $groupID, int $userID){
-    $groupMember = getMembersGroup($groupID);
+    $groupMember = json_decode(getInDB("members","group","id",$groupID)["members"]);
     if (!in_array($userID,$groupMember))array_push($groupMember, $userID);
     $con = openDB();
     $stmt = $con->prepare("UPDATE `group` SET members = ? WHERE id = ?");
     $stmt->bind_param("si", json_encode($groupMember) , $groupID);
     $stmt->execute();
     mysqli_close($con) ;
-}
-
-function getInvite(int $id) : array{
-    $db = openDB();
-    $stmt = $db->prepare("SELECT inviteGroup FROM user WHERE id = ?");
-    $stmt->bind_param("i",$id);
-    $stmt->execute();
-    $resultQuery = $stmt->get_result();
-    $inviteArray = json_decode(mysqli_fetch_assoc($resultQuery)["inviteGroup"]);
-    mysqli_close($db);
-    return $inviteArray;
 }
 
 function getGroupInfo(int $groupID) : array{
@@ -235,16 +184,6 @@ function getGroupInfo(int $groupID) : array{
     mysqli_close($db);
     return mysqli_fetch_assoc($resultQuery);
 }
-
-function getUsername(int $userID) : string{
-    $db = openDB();
-    $stmt = $db->prepare("SELECT username FROM user WHERE id = ?");
-    $stmt->bind_param("i",$userID);
-    $stmt->execute();
-    $resultQuery = $stmt->get_result();
-    mysqli_close($db);
-    return mysqli_fetch_assoc($resultQuery)["username"];
-}
 function getInDB(string $toSelect, string $table, string $rowToSearch, string|int $condition){
     $db = openDB();
     $sql = $db->prepare("SELECT $toSelect FROM `$table` WHERE $rowToSearch = ?");
@@ -255,7 +194,7 @@ function getInDB(string $toSelect, string $table, string $rowToSearch, string|in
 }
 
 function inviteUserGroup(int $userID, int $groupID){
-    $invites = getInvite($userID) ;
+    $invites = json_decode(getInDB("inviteGroup","user","id",$userID)["inviteGroup"]) ;
     if(!in_array($groupID,$invites)){
         array_push($invites,$groupID) ;
         $db = openDB();

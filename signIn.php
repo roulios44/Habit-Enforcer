@@ -38,8 +38,8 @@ function SignIn(String $username, String $password){
         if (checkPassword($username,$password)){
             session_start();
             $_SESSION["username"] = strip_tags($username) ;
-            $_SESSION["id"] = getID(strip_tags($username));
-            $_SESSION["groupID"] = getGroupID($_SESSION["id"]) ;
+            $_SESSION["id"] = getInDB("id","user","username",strip_tags($username))["id"];
+            $_SESSION["groupID"] = getInDB("groupID","user","id",$_SESSION["id"])["groupID"] ;
             header('Location: main.php');
         } else {
             echo "<p>Wrong password, try again</p>" ;

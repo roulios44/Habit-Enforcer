@@ -13,7 +13,7 @@ session_start() ?>
 
 <?php 
 function showAllInvite(){
-    $allInvite = getinvite($_SESSION["id"]) ;
+    $allInvite = json_decode(getInDB("inviteGroup","user","id",$_SESSION["id"])["inviteGroup"]) ;
     echo "<div class='container'>" ;
     foreach($allInvite as $invite){
         generateInviteBox($invite);
@@ -23,7 +23,7 @@ function showAllInvite(){
 
 function generateInviteBox(int $groupID){
     $infoGroup = getGroupInfo($groupID) ;
-    $ownerName = getUsername($infoGroup["ownerID"]) ;
+    $ownerName = getInDB("username","user","id",$infoGroup["ownerID"]) ;
     echo "
     <div class=userCard>
     <h1>" .$infoGroup["name"] ."</h1><br>
