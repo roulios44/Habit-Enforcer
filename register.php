@@ -3,23 +3,25 @@
 <?php include "head.php"?>
 <body>
     <?php include "header.php"?>
-    <div class="form">
-        <form action="register.php" method="POST">
-            <h2>Create a New Account</h2>
-            <br>
-            <div class="input">
-                <div class="username">
-                    <p>Username |<input class="form_name" type="text" name="username"></p>
-                </div>
-                <div class="password">
-                    <p>Password |<input class="form_name" type="password" name="password"></p>
-                </div>
-                <div class="email">
-                    <p> email |<input class="form_name" type="password" name="confirm_password"></p>
-                </div>
-            </div>
-        </form>
-        <p><input class="submit" type="submit" name="submit" value="Create your profile !"></input></p>
+    <div class="main">
+        <input type="checkbox" id="chk" aria-hidden="true">
+        <div class="signup">
+            <form>
+                <label for="chk" aria-hidden="true">Sign up</label>
+				<input type="text" name="txt" placeholder="User name" required="">
+				<input type="email" name="email" placeholder="Email" required="">
+				<input type="password" name="pswd" placeholder="Password" required="">
+				<button>Sign up</button>
+            </form>
+        </div>
+        <div class="login">
+            <form>
+                <label for="chk" aria-hidden="true">Login</label>
+				<input type="email" name="email" placeholder="Email" required="">
+				<input type="password" name="pswd" placeholder="Password" required="">
+				<button>Login</button>
+            </form>
+        </div>
     </div>
     <?php beginRegister() ;?>
 </body>
