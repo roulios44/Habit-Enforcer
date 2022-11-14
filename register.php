@@ -21,9 +21,9 @@
 
 <?php
 function beginRegister(){
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    $mail = $_POST["mail"];
+    $username = strip_tags($_POST["username"]);
+    $password = strip_tags($_POST["password"]);
+    $mail = strip_tags($_POST["mail"]);
     if(empty($username) || empty($password) || empty($mail)){
         echo "Please fill all fields please<br>";
     } else {
@@ -33,9 +33,9 @@ function beginRegister(){
 function register(){
     require("request.php") ;
     $alreadyUse = false;
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    $mail = $_POST["mail"];
+    $username = strip_tags($_POST["username"]);
+    $password = strip_tags( $_POST["password"]);
+    $mail = strip_tags($_POST["mail"]);
     if ((alreadyExist($username,"user","username"))){
         echo "username '$username' is already use, please chose another one <br>" ;
         $alreadyUse = true;

@@ -39,6 +39,6 @@ function generateInviteBox(int $groupID){
 }
 
 function acceptInvite(){
-    if ($_POST["groupID"])addUserGroup($_POST["groupID"],$_SESSION["id"]);
+    if ($_POST["groupID"])addUserGroup(strip_tags($_POST["groupID"]),$_SESSION["id"]);
 }
 ?>

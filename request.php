@@ -34,11 +34,11 @@ function refreshLastConnection(int $userID) {
 function createHabit() {
     $con = openDB();
     if (isset($_POST["description"],$_POST["difficulty"],$_POST["color"],$_POST["time"])){
-        $description = $_POST["description"];
-        $difficulty = $_POST["difficulty"];
-        $color = $_POST["color"];
+        $description = strip_tags($_POST["description"]);
+        $difficulty =strip_tags($_POST["difficulty"]);
+        $color = strip_tags($_POST["color"]);
         $start = date("Y-m-d H:i:s");
-        $time = $_POST["time"];
+        $time = strip_tags($_POST["time"]);
         $userID = $_SESSION["id"];
         $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
         $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
