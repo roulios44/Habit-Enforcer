@@ -43,7 +43,17 @@
                     </select>
                     <input type="submit" id="submit" value = "Add habit">
                     </form>
-                    <?php createHabit() ?>
+                    <?php 
+                    $date = date("Y-m-d");
+                    $stmt = $con->prepare("SELECT lastAddHabit FROM user WHERE id = $_SESSION[id]");
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    $nbDaysBetween = (strtotime($date)-strtotime(mysqli_fetch_assoc($result)['lastAddHabit']))/86400;
+                    if ($nbDaysBetween >1) {
+                        createHabit();
+                    } else {
+                        echo "<div>Already added an habit</div>";
+                    }?>
                 </div>
             </div>
             <?php

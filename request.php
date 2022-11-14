@@ -33,14 +33,16 @@ function refreshLastConnection(int $userID) {
 function createHabit() {
     $con = openDB();
     if (isset($_POST["description"],$_POST["difficulty"],$_POST["color"],$_POST["time"])){
+        $userID = $_SESSION["id"];
         $description = $_POST["description"];
         $difficulty = $_POST["difficulty"];
         $color = $_POST["color"];
         $start = date("Y-m-d H:i:s");
         $time = $_POST["time"];
-        $userID = $_SESSION["id"];
         $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
         $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
+        $stmt->execute();
+        $stmt = $db->prepare("UPDATE user SET lastAddHabit = $date WHERE id = $userID");
         $stmt->execute();
     }else {
         echo "Please fill all the required fields to add an habit";
