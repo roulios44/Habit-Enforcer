@@ -71,7 +71,7 @@ body{
     align-items: stretch;
     align-content: stretch;
 }
-.leftHeader{
+#leftHeader{
     height: 100%;
     width: 60%;
     display: flex;
@@ -81,7 +81,7 @@ body{
     align-items: stretch;
     align-content: stretch;
 }
-.rightHeader{
+#rightHeader{
     background-color: #9ADFA3;
     height: 100%;
     width: 40%;
@@ -92,7 +92,9 @@ body{
     align-items: stretch;
     align-content: stretch;
 }
-
+#deconnexionForm{
+  margin-right: 1%;
+}
 #allColumns{
 	display: flex;
 	flex-direction: row;

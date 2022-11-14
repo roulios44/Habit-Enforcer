@@ -13,7 +13,7 @@ function openDB() {
 }
 
 function addUserDB(String $username, String $email, String $pwd) {
-    $currentDate = date("Y-m-d H:i:s");
+    $currentDate = date("Y-m-d");
     $con = openDB();
     $stmt = $con->prepare("INSERT INTO user (username, email, password,lastConnection) VALUES (?,?,?,?)");
     $stmt->bind_param("ssss", $username, $email, $pwd, $currentDate);
@@ -109,10 +109,44 @@ function dbGroupCreate(String $groupName, int $ownerID){
 
 function completeTask(int $done, int $id) {
     $con = openDB();
+    $stmt = $con->prepare("SELECT isDone, userID, difficulty FROM habit WHERE id = ?");
+    $stmt->bind_param("s",$id);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    $row = $resultQuery->fetch_assoc();
     $stmt = $con->prepare("UPDATE habit SET isDone = ? WHERE id = ?");
     $stmt->bind_param("ss",$done, $id);
     $stmt->execute();
+    if ($row['isDone'] != $done) {
+        $score = defineScoreUpdate($done, $row['difficulty'],"instantManaging");
+        $stmt = $con->prepare("UPDATE user SET score = score+? WHERE id = ?");
+        $stmt->bind_param("ss",$score, $row['userID']);
+        $stmt->execute();
+    }
     mysqli_close($con) ;
+}
+
+function getScore($id) : int {
+    $con = openDB();
+    $stmt = $con->prepare("SELECT score FROM user WHERE id = ?");
+    $stmt->bind_param("s",$id);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    $row = $resultQuery->fetch_assoc();
+    return $row["score"];
+    mysqli_close($con) ;
+}
+
+function defineScoreUpdate($done, $difficulty, $situation){
+    $arr = [10,20,30,40,50];
+    if ($done == 1 && $situation == "instantManaging") {
+        return $arr[$difficulty-1];
+    } else if ($done == 0 && $situation == "withTimeManaging") {
+        $reverse = array_reverse($arr);
+        return -$reverse[$difficulty-1];
+    } else {
+        return -$arr[$difficulty-1];
+    }
 }
 
 function alreadyInvited(int $id,int $groupId){
@@ -133,18 +167,17 @@ function getID(string $username) : int {
     $stmt->bind_param("s",$username);
     $stmt->execute();
     $resultQuery = $stmt->get_result();
-    mysqli_close($db);
-    return $resultQuery->fetch_assoc()["id"];
+    $row = $resultQuery->fetch_assoc();
+    return $row['id'];
 }
 
-function getGroupID(int $id){
-    $db = openDB();
-    $stmt = $db->prepare("SELECT groupID FROM user WHERE id = ?");
-    $stmt->bind_param("i",$id);
+function getGroupID(int $userID) : int|null{
+    $con = openDB();
+    $stmt = $con->prepare("SELECT groupID FROM user WHERE id = ?");
+    $stmt->bind_param("s",$userID);
     $stmt->execute();
-    $resultQuery = $stmt->get_result();
-    mysqli_close($db);
-    return $resultQuery->fetch_assoc()["groupID"];
+    $result = $stmt->get_result();
+    return mysqli_fetch_assoc($result)['groupID'];
 }
 
 function addUserGroup(int $groupID, int $userID){
@@ -224,4 +257,32 @@ function inviteUserGroup(int $userID, int $groupID){
         $sql = $db->prepare("UPDATE user SET inviteGroup = ? WHERE id = ?") ;
         $sql->execute([json_encode($invites),$userID]);
     }
+}
+function habitExpire(int $id) {
+    $db = openDB();
+    $stmt = $db->prepare("SELECT `start`, `time`, isDone, difficulty, userID FROM habit WHERE id = ?");
+    $stmt->bind_param("s",$id);
+    $stmt->execute();
+    $resultQuery = $stmt->get_result();
+    $row = $resultQuery->fetch_assoc();
+    $date = date("Y-m-d");
+    $habitDate = $row['start'];
+    $nbDaysBetween = (strtotime($date)-strtotime($habitDate))/86400;
+    if (($row['time']=="daily" && $nbDaysBetween >= 1) ||($row['time']=="weekly" && $nbDaysBetween >= 7)) {
+        if ($row['isDone'] == 0) {
+            $score = defineScoreUpdate($row['isDone'], $row['difficulty'], "withTimeManaging")*$nbDaysBetween;
+            $stmt = $db->prepare("UPDATE user SET score = score+? WHERE id = ?");
+            $stmt->bind_param("ss",$score, $row['userID']);
+            $stmt->execute();
+        }
+        resetTime($date, $id);
+    }
+}
+
+function resetTime($date, $id) {
+    $db = openDB();
+    $stmt = $db->prepare("UPDATE habit SET `start` = ?, isDone = 0 WHERE id = ?");
+    $stmt->bind_param("ss", $date, $id);
+    $stmt->execute();
+    mysqli_close($db) ;
 }
