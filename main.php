@@ -59,6 +59,7 @@
                 echo "<div id=allHabits>";
                 while ($row = mysqli_fetch_assoc($result)) {
                     array_push($IDArray, $row['id']);
+                    habitExpire($row['id']);
                     if (isset($_POST['changeHabit'])) {
                         $isDone = (isset($_POST["isDone_".$row['id']]) ? '1' : '0');
                         completeTask($isDone,$row['id']);

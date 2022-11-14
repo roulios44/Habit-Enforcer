@@ -26,7 +26,7 @@ function BeginSignIn(){
     $username = $_POST["username"];
     $password = $_POST["password"];
     if(empty($username) || empty($password)){
-        echo "Please fill all fields please<br>";
+        echo "<p>Please fill all fields please</p><br>";
     } else {
         SignIn($username, $password);
     }
@@ -39,6 +39,7 @@ function SignIn(String $username, String $password){
             session_start();
             $_SESSION["username"] = $username;
             $_SESSION["id"] = getID($username);
+            $_SESSION["groupID"] = getGroupID($_SESSION["id"]) ;
             header('Location: main.php');
         } else {
             echo "<p>Wrong password, try again</p>" ;

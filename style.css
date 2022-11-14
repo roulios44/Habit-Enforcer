@@ -24,19 +24,18 @@
     background-color: blue;
 }
 .header{
-    width: 100%;
-    height: 20%;
-    background-color: #65AB96;
-    align-items: center;
-    align-content: center;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: stretch;
-    align-content: stretch;
-
+  width: 100%;
+  height: 20%;
+  background-color: orange;
+  align-items: center;
+  align-content: center;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: stretch;
 }
 body{
 	background-color: #23785E;
@@ -189,7 +188,6 @@ input#difficulty-5:checked ~ label{
   background-color: red;
 }
 .container{
-  margin: 20px;
   height: 100%;
   width: 100%;
   display:flex;
