@@ -177,7 +177,7 @@ function updateGroupMembers(int $groupID, int $userID){
     mysqli_close($con) ;
 }
 
-function getinvite(int $id) : array{
+function getInvite(int $id) : array{
     $db = openDB();
     $stmt = $db->prepare("SELECT inviteGroup FROM user WHERE id = ?");
     $stmt->bind_param("i",$id);
@@ -214,4 +214,14 @@ function getInDB(string $toSelect, string $table, string $rowToSearch, string|in
     $resultQuery = $sql->get_result();
     mysqli_close($db) ;
     return mysqli_fetch_assoc($resultQuery) ;
+}
+
+function inviteUserGroup(int $userID, int $groupID){
+    $invites = getInvite($userID) ;
+    if(!in_array($groupID,$invites)){
+        array_push($invites,$groupID) ;
+        $db = openDB();
+        $sql = $db->prepare("UPDATE user SET inviteGroup = ? WHERE id = ?") ;
+        $sql->execute([json_encode($invites),$userID]);
+    }
 }

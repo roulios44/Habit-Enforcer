@@ -6,7 +6,6 @@ session_start() ?>
     <?php include "head.php"?>
     <?php include "header.php"?>
     <body>
-        <?php  echo $_SESSION["groupID"]?>
         <div class="search">
             <form action="" method="POST">
                 <p>Search a user: <input type="text" name="searchUser"></p>
@@ -21,8 +20,9 @@ session_start() ?>
 
 <?php
 function beginSearch(){
+    if(!empty($_POST["search"]))inviteUser($_POST["search"]);
     $searchValue = $_POST['searchUser'] ;
-    if(!empty($_POST['searchUser'])){
+    if(!empty($searchValue)){
         search($searchValue);
     }
 }
@@ -39,14 +39,12 @@ function search(String $searchValue){
 }
 
 function createUserResultCard(array $user,string $search){
-    //TODO remove idGroup by the current User idGroup (if he get one) else dont echo invite button
-
     $username = $user["username"] ;
     $id = $user["id"];
     $inviteMessage = getInviteMessage($id);
     echo "<div class='userCard'>
      <p>$username</p>
-    <form method='POST' action='http://localhost/Habit-Enforcer/test.php'>
+    <form method='POST'>
             $inviteMessage
             <input type='hidden' value='$id' name='idUser'>
             <input type='hidden' value='$search' name='search'>
@@ -54,9 +52,10 @@ function createUserResultCard(array $user,string $search){
     </div>" ;
 }
 
-function inviteUser(){
+function inviteUser(string $search){
     if(!empty($_POST["idUser"])){
-        addUserGroup($_SESSION["groupID"], $_POST["idUser"]);
+        inviteUserGroup($_POST["idUser"], $_SESSION["groupID"]);
+        search($search);
     }
 }
 

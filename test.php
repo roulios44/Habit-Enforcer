@@ -6,8 +6,7 @@ session_start() ?>
     <?php include "head.php"?>
     <?php include "header.php"?>
     <body>
-        <?php 
-        inviteUser();?>
+        <?php inviteUser() ?>
     </body>
     <?php include "footer.php"?>
 </html>
@@ -15,7 +14,8 @@ session_start() ?>
 <?php
 function inviteUser(){
     if(($_POST["idUser"])){
-        addUserGroup($_SESSION["groupID"], $_POST["idUser"]); 
+        inviteUserGroup($_POST["idUser"], $_SESSION["groupID"]);
+        print_r(getInvite($_POST["idUser"])) ;
     }
 }
 ?>
