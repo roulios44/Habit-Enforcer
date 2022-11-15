@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+    <?php include "head.php" ?>
+<body>
+   <?php include "header.php"?> 
+   <div class="container">
+   </div>
+</body>
+<?php include "footer.php" ?>
+</html>

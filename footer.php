@@ -1,3 +1,3 @@
 <div class="footer">
-    <?php echo "footer"; ?>
+    <?php echo "<p>footer</p>"; ?>
 </div>

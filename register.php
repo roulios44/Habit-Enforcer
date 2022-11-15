@@ -58,6 +58,9 @@ function register(){
         echo "mail '$mail' is alreadu use for a account <br>";
         $alreadyUse = true;
     }
-    if(!$alreadyUse)addUserDB($username,$mail,$password);
+    if(!$alreadyUse){
+        addUserDB($username,$mail,$password);
+        header('Location: signIn.php');
+    }
 }
 ?>

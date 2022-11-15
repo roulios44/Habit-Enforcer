@@ -1,3 +1,4 @@
+<?php require "request.php"?>
 <!DOCTYPE html>
 <html lang="en">
     <?php
@@ -25,21 +26,25 @@ function BeginSignIn(){
     $username = $_POST["username"];
     $password = $_POST["password"];
     if(empty($username) || empty($password)){
-        echo "Please fill all fields please<br>";
+        echo "<p>Please fill all fields please</p><br>";
     } else {
         SignIn($username, $password);
     }
 }
 
 function SignIn(String $username, String $password){
-    require "request.php";
     if (!alreadyExist($username,"user", "username"))echo "This username is unknow of our website, you can create a account with this one";
     else {
         if (checkPassword($username,$password)){
-            echo "good password" ;
+            session_start();
+            $_SESSION["username"] = $username;
+            $_SESSION["id"] = getID($username);
+            $_SESSION["groupID"] = getGroupID($_SESSION["id"]) ;
+            header('Location: main.php');
         } else {
-            echo "Wrong password, try again" ;
+            echo "<p>Wrong password, try again</p>" ;
         }
+
     }
 }
 ?>
