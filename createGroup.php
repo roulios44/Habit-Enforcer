@@ -32,7 +32,8 @@ function createGroup(String $groupName){
     if (alreadyExist($groupName,"group","name")){
         echo "this group name already exist";
     } else {
-        dbGroupCreate($groupName,$_SESSION["id"]);
+        $idGroup = dbGroupCreate($groupName,$_SESSION["id"]);
+        $_SESSION["groupID"] = $idGroup ;
     }
 }
 
