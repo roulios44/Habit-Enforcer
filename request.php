@@ -281,3 +281,10 @@ function resetTime($date, $id) {
     $stmt->bind_param("ss", $date, $id);
     $stmt->execute();
 }
+
+function deleteTask($id) {
+    $db = openDB();
+    $stmt = $db->prepare("DELETE FROM habit WHERE id = ?");
+    $stmt->bind_param("s", $id);
+    $stmt->execute();
+}

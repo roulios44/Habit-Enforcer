@@ -16,11 +16,10 @@
         <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking
             <?php
                 $con = openDB();
-                //TODO change for groups in score order
-                $query = "SELECT username FROM user";
+                $query = "SELECT `name` FROM `group` ORDER BY score";
                 $result = mysqli_query($con, $query);
                 while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<div>".$row['username']."</div>";
+                    echo "<div>".$row['name']."</div>";
                 }
             ?>
             </div>
@@ -80,6 +79,9 @@
                     if (isset($_POST['changeHabit'])) {
                         $isDone = (isset($_POST["isDone_".$row['id']]) ? '1' : '0');
                         completeTask($isDone,$row['id']);
+                    } else if (isset($_POST["removeHabit".$row['id']])) {
+                        deleteTask($row['id']);
+                        continue;
                     }
                     $done = checkIfDone($row['id']);
                     $sayDone = "Done";
@@ -88,7 +90,7 @@
                         $check = "checked";
                         $sayDone = "Undone";
                     }
-                    echo "<div class=habitStyle style=background-color:".$row['color']."> <input type=checkbox name=isDone_".$row['id']." id=isDone_".$row['id']." value=done ".$check.">".$row['description']." </div>";
+                    echo "<div class=habitStyle style=background-color:".$row['color']."> <input type=checkbox name=isDone_".$row['id']." id=isDone_".$row['id']." value=done ".$check.">".$row['description']." <input type=submit name=removeHabit".$row['id']." value=x> </div>";
                 }
                 echo "<input type=submit name=changeHabit>";
                 echo "</div>";
