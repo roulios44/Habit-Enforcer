@@ -288,3 +288,10 @@ function deleteTask($id) {
     $stmt->bind_param("s", $id);
     $stmt->execute();
 }
+
+function deleteAccount($id) {
+    $db = openDB();
+    $stmt = $db->prepare("DELETE FROM user WHERE id = ?");
+    $stmt->bind_param("s", $id);
+    $stmt->execute();
+}
