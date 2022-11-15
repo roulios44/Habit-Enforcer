@@ -230,3 +230,10 @@ function resetTime($date, $id) {
     $stmt->execute();
     mysqli_close($db) ;
 }
+function updateInDB(string $table, string $rowToUpdate,mixed $newValue, string $tableCondition ,string $condition){
+    $db = openDB();
+    echo "UPDATE `$table` SET `$rowToUpdate` = '$newValue' WHERE $tableCondition = $condition <br>";
+    $sql = $db->prepare("UPDATE `$table` SET `$rowToUpdate` = ? WHERE $tableCondition = ?");
+    $sql->execute([$newValue,$condition]);
+    mysqli_close($db) ;
+}
