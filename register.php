@@ -16,13 +16,14 @@
         </div>
         <div class="login">
 			<form>
-				<label for="chk" aria-hidden="true">Login</label>
-				<input type="email" name="email" placeholder="Email" required="">
-				<input type="password" name="pswd" placeholder="Password" required="">
-				<button>Login</button>
+				<label for="chk" aria-hidden="true">SignIn</label>
+				<input type="username" name="username" placeholder="username" required="">
+				<input type="password" name="password" placeholder="password" required="">
+				<button>SignIn</button>
 			</form>
 		</div>
         <?php beginRegister() ;?>
+        <?php BeginSignIn()?>
     </div>
 </body>
 </html>
@@ -63,4 +64,30 @@ function register(){
         header('Location: signIn.php');
     }
 }
+
+function BeginSignIn(){
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+    if(empty($username) || empty($password)){
+        echo "<p>Please fill all fields please</p><br>";
+    } else {
+        SignIn($username, $password);
+    }
+}
+
+function SignIn(String $username, String $password){
+    if (!alreadyExist($username,"user", "username"))echo "This username is unknow of our website, you can create a account with this one";
+    else {
+        if (checkPassword($username,$password)){
+            session_start();
+            $_SESSION["username"] = $username;
+            $_SESSION["id"] = getID($username);
+            $_SESSION["groupID"] = getGroupID($_SESSION["id"]) ;
+            header('Location: main.php');
+        } else {
+            echo "<p>Wrong password, try again</p>" ;
+        }
+
+    }
+}   
 ?>
