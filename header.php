@@ -1,8 +1,8 @@
 <div class="header">
-    <div id="leftHeader">
+    <div class="leftHeader">
         <p>left Header </p>
     </div>
-    <div id="rightHeader">
+    <div class="rightHeader">
         <p>right Header </p>
     </div>
     <?php 

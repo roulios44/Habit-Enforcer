@@ -6,7 +6,6 @@ session_start() ?>
     <?php include "head.php"?>
     <?php include "header.php"?>
     <body>
-        <?php  echo $_SESSION["groupID"]?>
         <div class="search">
             <form action="" method="POST">
                 <p>Search a user: <input type="text" name="searchUser"></p>
@@ -21,8 +20,9 @@ session_start() ?>
 
 <?php
 function beginSearch(){
-    $searchValue = $_POST['searchUser'] ;
-    if(!empty($_POST['searchUser'])){
+    if(!empty($_POST["search"]))inviteUser($_POST["search"]);
+    $searchValue =strip_tags($_POST['searchUser']) ;
+    if(!empty($searchValue)){
         search($searchValue);
     }
 }
@@ -39,14 +39,12 @@ function search(String $searchValue){
 }
 
 function createUserResultCard(array $user,string $search){
-    //TODO remove idGroup by the current User idGroup (if he get one) else dont echo invite button
-
     $username = $user["username"] ;
     $id = $user["id"];
     $inviteMessage = getInviteMessage($id);
     echo "<div class='userCard'>
      <p>$username</p>
-    <form method='POST' action='http://localhost/Habit-Enforcer/test.php'>
+    <form method='POST'>
             $inviteMessage
             <input type='hidden' value='$id' name='idUser'>
             <input type='hidden' value='$search' name='search'>
@@ -54,16 +52,17 @@ function createUserResultCard(array $user,string $search){
     </div>" ;
 }
 
-function inviteUser(){
+function inviteUser(string $search){
     if(!empty($_POST["idUser"])){
-        addUserGroup($_SESSION["groupID"], $_POST["idUser"]);
+        inviteUserGroup(strip_tags($_POST["idUser"]), $_SESSION["groupID"]);
+        search($search);
     }
 }
 
 function getInviteMessage(int $userID) : string{
     if (!$_SESSION["id"])return "<p>You have to be connected to invite some one to a group</p>" ;
     if (is_null($_SESSION["groupID"]))return "<p>You are not in a group, join one to invite a user to a group</p>" ;
-    else if(getGroupID($userID))return "<p>Already in a groupe</p>" ;
+    else if(getInDB("groupID","user","id",$userID))return "<p>Already in a groupe</p>" ;
     else if(alreadyInvited($userID,$_SESSION["groupID"]))return "<p>Already invited</p>" ;
     return "<p><input type='submit' value='invite'></p>";
 }

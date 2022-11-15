@@ -20,7 +20,7 @@ session_start();
 
 <?php
 function beginGroupCreation(){
-    $groupName = $_POST["groupName"];
+    $groupName = strip_tags($_POST["groupName"]);
     if(empty($groupName))echo "Please enter a name of group";
     elseif(strlen($groupName)>25)echo "Max size of name : 25 characters" ;
     else{

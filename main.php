@@ -108,10 +108,10 @@
             ?>
         </div>
         <div id="group" name="group" class="group" class="aColumn">Group
-            <div id=totalScore> Total score = <?= getScore($_SESSION["id"]);?> </div>
+            <div id=totalScore> Total score = <?= getInDB("score","user","id" ,$_SESSION["id"])["score"];?> </div>
             <?php 
                 $con = openDB();
-                $groupID = getGroupID($_SESSION["id"]);
+                $groupID = getInDB("groupID","user","id",$_SESSION["id"])["groupID"];
                 if ($groupID != null) {
                     echo "<form method=POST id=invite><input type=submit name=invite value=invite people></form>";
                     $stmt = $con->prepare("SELECT username FROM user WHERE groupID = ?");
