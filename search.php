@@ -21,7 +21,7 @@ session_start() ?>
 <?php
 function beginSearch(){
     if(!empty($_POST["search"]))inviteUser($_POST["search"]);
-    $searchValue = $_POST['searchUser'] ;
+    $searchValue =strip_tags($_POST['searchUser']) ;
     if(!empty($searchValue)){
         search($searchValue);
     }
@@ -54,7 +54,7 @@ function createUserResultCard(array $user,string $search){
 
 function inviteUser(string $search){
     if(!empty($_POST["idUser"])){
-        inviteUserGroup($_POST["idUser"], $_SESSION["groupID"]);
+        inviteUserGroup(strip_tags($_POST["idUser"]), $_SESSION["groupID"]);
         search($search);
     }
 }
@@ -62,7 +62,7 @@ function inviteUser(string $search){
 function getInviteMessage(int $userID) : string{
     if (!$_SESSION["id"])return "<p>You have to be connected to invite some one to a group</p>" ;
     if (is_null($_SESSION["groupID"]))return "<p>You are not in a group, join one to invite a user to a group</p>" ;
-    else if(getGroupID($userID))return "<p>Already in a groupe</p>" ;
+    else if(getInDB("groupID","user","id",$userID))return "<p>Already in a groupe</p>" ;
     else if(alreadyInvited($userID,$_SESSION["groupID"]))return "<p>Already invited</p>" ;
     return "<p><input type='submit' value='invite'></p>";
 }

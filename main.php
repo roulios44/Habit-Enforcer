@@ -89,10 +89,10 @@
             ?>
         </div>
         <div id="group" name="group" class="group" class="aColumn">Group
-            <div id=totalScore> Total score = <?= getScore($_SESSION["id"]);?> </div>
+            <div id=totalScore> Total score = <?= getInDB("score","user","id" ,$_SESSION["id"])["score"];?> </div>
             <?php 
                 $con = openDB();
-                $groupID = getGroupID($_SESSION["id"]);
+                $groupID = getInDB("groupID","user","id",$_SESSION["id"])["groupID"];
                 $stmt = $con->prepare("SELECT username FROM user WHERE groupID = ?");
                 $stmt->bind_param("s",$groupID);
                 $stmt->execute();

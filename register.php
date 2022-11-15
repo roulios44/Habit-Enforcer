@@ -6,23 +6,23 @@
     <div class="main">
         <input type="checkbox" id="chk" aria-hidden="true">
         <div class="signup">
-            <form>
+            <form action="" method="POST">  
                 <label for="chk" aria-hidden="true">Sign up</label>
-				<input type="text" name="username" placeholder="User name" >
-				<input type="text" name="mail" placeholder="Email" >
-				<input type="text" name="password" placeholder="Password" >
+				<input type="username" name="SignUpusername" placeholder="Username" >
+				<input type="text" name="SignUpmail" placeholder="Email" >
+				<input type="password" name="SignUppassword" placeholder="Password" >
 				<button>Sign up</button>
             </form>
         </div>
         <div class="login">
-			<form>
-				<label for="chk" aria-hidden="true">SignIn</label>
-				<input type="username" name="username" placeholder="username" required="">
-				<input type="password" name="password" placeholder="password" required="">
-				<button>SignIn</button>
+			<form action="" method="POST">
+				<label for="chk" aria-hidden="true">Sign In</label>
+				<input type="username" name="SignInpusername" placeholder="username" required="">
+				<input type="password" name="SignInpassword" placeholder="password" required="">
+				<button type="submit" value="connect">Sign In</button>
 			</form>
 		</div>
-        <?php beginRegister() ;?>
+        <?php beginRegister()?>
         <?php BeginSignIn()?>
     </div>
 </body>
@@ -33,55 +33,57 @@
 
 <?php
 function beginRegister(){
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        echo "HI bitch <br>" ;
-        echo $_POST["username"] ;
-        $username = $_POST["username"];
-        $mail = $_POST["mail"];
-        $password = $_POST["password"];
-        if(empty($username) || empty($mail) || empty($password)){
+    if($_SERVER["REQUEST METHOD"] == "POST"){
+        $SignUpusername = strip_tags($_POST["SignUpusername"]);
+        $SignUppassword = strip_tags($_POST["SignUppassword"]);
+        $SignUpmail = strip_tags($_POST["SignUpmail"]);
+        if(empty($SignUpusername) || empty($SignUppassword) || empty($SignUpmail)){
             echo "Please fill all fields please<br>";
         } else {
-            register($username, $mail, $password);
+            register();
         }
     }
 }
 function register(){
-    $alreadyUse = false;
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    $mail = $_POST["mail"];
-    if ((alreadyExist($username,"user","username"))){
-        echo "username '$username' is already use, please chose another one <br>" ;
-        $alreadyUse = true;
-    }
-    if (alreadyExist($mail,"user","email")){
-        echo "mail '$mail' is alreadu use for a account <br>";
-        $alreadyUse = true;
-    }
-    if(!$alreadyUse){
-        addUserDB($username,$mail,$password);
-        header('Location: signIn.php');
+    if($_SERVER["REQUEST METHOD"] == "POST"){
+        $alreadyUse = false;
+        $SignUpusername = strip_tags($_POST["SignUpusername"]);
+        $SignUppassword = strip_tags( $_POST["SignUppassword"]);
+        $SignUpmail = strip_tags($_POST["SignUpmail"]);
+        if ((alreadyExist($SignUpusername,"SignUpuser","SignUpusername"))){
+            echo "SignUpusername '$SignUpusername' is already use, please chose another one <br>" ;
+            $alreadyUse = true;
+        }
+        if (alreadyExist($SignUpmail,"SignUpuser","SignUpemail")){
+            echo "mail '$SignUpmail' is already use for a account <br>";
+            $alreadyUse = true;
+        }
+        if(!$alreadyUse){
+            addUserDB($SignUpusername,$SignUpmail,$SignUppassword);
+            header('Location: signIn.php');
+        }
     }
 }
 
 function BeginSignIn(){
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    if(empty($username) || empty($password)){
-        echo "<p>Please fill all fields please</p><br>";
-    } else {
-        SignIn($username, $password);
+    if($_SERVER["REQUEST METHOD"] == "POST"){
+        $SignInusername = $_POST["SignInusername"];
+        $SignInpassword = $_POST["SignInpassword"];
+        if(empty($SignInusername) || empty($SignInpassword)){
+            echo "<p>Please fill all fields please</p><br>";
+        } else {
+            SignIn($SignInusername, $SignInpassword);
+        }
     }
 }
 
-function SignIn(String $username, String $password){
-    if (!alreadyExist($username,"user", "username"))echo "This username is unknow of our website, you can create a account with this one";
+function SignIn(String $SignInusername, String $SignInpassword){
+    if (!alreadyExist($SignInusername,"SignInuser", "SignInusername"))echo "This username is unknow of our website, you can create a account with this one";
     else {
-        if (checkPassword($username,$password)){
+        if (checkPassword($SignInusername,$SignInpassword)){
             session_start();
-            $_SESSION["username"] = $username;
-            $_SESSION["id"] = getID($username);
+            $_SESSION["SignInusername"] = $SignInusername;
+            $_SESSION["id"] = getID($SignInusername);
             $_SESSION["groupID"] = getGroupID($_SESSION["id"]) ;
             header('Location: main.php');
         } else {

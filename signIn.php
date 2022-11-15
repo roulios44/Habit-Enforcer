@@ -23,8 +23,8 @@
 
 <?php 
 function BeginSignIn(){
-    $username = $_POST["username"];
-    $password = $_POST["password"];
+    $username = strip_tags($_POST["username"]);
+    $password = strip_tags($_POST["password"]);
     if(empty($username) || empty($password)){
         echo "<p>Please fill all fields please</p><br>";
     } else {
@@ -37,9 +37,9 @@ function SignIn(String $username, String $password){
     else {
         if (checkPassword($username,$password)){
             session_start();
-            $_SESSION["username"] = $username;
-            $_SESSION["id"] = getID($username);
-            $_SESSION["groupID"] = getGroupID($_SESSION["id"]) ;
+            $_SESSION["username"] = strip_tags($username) ;
+            $_SESSION["id"] = getInDB("id","user","username",strip_tags($username))["id"];
+            $_SESSION["groupID"] = getInDB("groupID","user","id",$_SESSION["id"])["groupID"] ;
             header('Location: main.php');
         } else {
             echo "<p>Wrong password, try again</p>" ;
