@@ -84,8 +84,10 @@ function checkPassword(String $username, String $password){
 }
 function searchUser(String $usernameSearch):array | bool{
     $db = openDB();
+    $usrSearch = "%$usernameSearch%";
     $sql = $db->prepare("SELECT username,id FROM user WHERE username LIKE ?");
-    $sql->execute((["%$usernameSearch%"]));
+    $sql->bind_param("s", $usrSearch);
+    $sql->execute();
     $resultQuery = $sql->get_result();
     if ($resultQuery->num_rows<=0){
         mysqli_close($db) ;
@@ -154,7 +156,8 @@ function defineScoreUpdate($done, $difficulty, $situation){
 function alreadyInvited(int $id,int $groupId){
     $db = openDB();
     $sql = $db->prepare("SELECT inviteGroup FROM user WHERE id = ?");
-    $sql->execute(([$id]));
+    $sql->bind_param("s",$id);
+    $sql->execute();
     $resultQuery = $sql->get_result();
     $arrayGroupInvite = json_decode($resultQuery->fetch_assoc()['inviteGroup']);
     mysqli_close($db);

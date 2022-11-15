@@ -33,6 +33,7 @@ function createGroup(String $groupName){
         echo "this group name already exist";
     } else {
         dbGroupCreate($groupName,$_SESSION["id"]);
+        header('Location: main.php');
     }
 }
 

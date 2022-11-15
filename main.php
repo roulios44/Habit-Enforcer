@@ -5,6 +5,13 @@
 <body>
     <?php include "header.php"?>
     <?php include 'request.php';?>
+    <?php                 
+        if (isset($_POST["viewInvite"])) {
+        header('Location: checkInvite.php');
+        } else if (isset($_POST["createGroup"])) {
+            header('Location: createGroup.php');
+        }
+    ?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking
             <?php
@@ -61,7 +68,7 @@
             ?>
             <?php
                 $con = openDB();
-                $query = "SELECT description, id FROM habit WHERE userID = $_SESSION[id]";
+                $query = "SELECT description, id, color FROM habit WHERE userID = $_SESSION[id] ORDER BY color";
                 $result = mysqli_query($con, $query);
                 $nbRows = mysqli_num_rows($result);
                 $IDArray = [];
@@ -81,7 +88,7 @@
                         $check = "checked";
                         $sayDone = "Undone";
                     }
-                    echo "<div> <input type=checkbox name=isDone_".$row['id']." id=isDone_".$row['id']." value=done ".$check.">".$row['description']." </div>";
+                    echo "<div class=habitStyle style=background-color:".$row['color']."> <input type=checkbox name=isDone_".$row['id']." id=isDone_".$row['id']." value=done ".$check.">".$row['description']." </div>";
                 }
                 echo "<input type=submit name=changeHabit>";
                 echo "</div>";
@@ -103,12 +110,18 @@
             <?php 
                 $con = openDB();
                 $groupID = getGroupID($_SESSION["id"]);
-                $stmt = $con->prepare("SELECT username FROM user WHERE groupID = ?");
-                $stmt->bind_param("s",$groupID);
-                $stmt->execute();
-                $result2 = $stmt->get_result();
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<div>".$row['username']."</div>";
+                if ($groupID != null) {
+                    echo "<form method=POST id=invite><input type=submit name=invite value=invite people></form>";
+                    $stmt = $con->prepare("SELECT username FROM user WHERE groupID = ?");
+                    $stmt->bind_param("s",$groupID);
+                    $stmt->execute();
+                    $result2 = $stmt->get_result();
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<div>".$row['username']."</div>";
+                    }
+                } else {
+                        echo "<form method=POST id=viewInvite><input type=submit name=viewInvite value=invitations></form>";
+                        echo "<form method=POST id=createGroup><input type=submit name=createGroup value=Create&nbsp;group></form>";
                 }
             ?>
         </div>
