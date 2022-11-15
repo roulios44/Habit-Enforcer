@@ -8,10 +8,21 @@ session_start();
     ?>
     <body>
         <?php include "header.php" ?>
-        <form method="POST" action="">
-            <input type="submit" value="Leave group" name="leave">
-        </form>
-        <?php leaveGroup() ?>
+        <?php
+        if(!gettype($_SESSION["id"])){
+            echo "<p>You have to be connected to acces this</p>" ;
+        }
+        if(gettype($_SESSION["groupID"]) == "integer" ){
+            echo "
+            <form method='POST' action=''>
+                <input type='submit' value='Leave group' name='leave'>
+            </form>
+            ";
+            leaveGroup() ;
+        } else {
+            echo"<p>You have to be in a group to acces to this Page</p><br>";
+        }
+        ?>
     </body>
     <?php include "footer.php" ;?>
 </html>

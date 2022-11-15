@@ -8,6 +8,11 @@ session_start();
 <body>
    <?php include "header.php"?> 
    <div class="container">
+    <?php
+    if (getInDB("ownerID", "group","id", $_SESSION["groupID"])["ownerID"] == $_SESSION["id"]){
+        
+    }
+    ?>
     <form method="POST" action="">
         <input type="submit" value="Destroy current groupe" name="destroy">
     </form>
