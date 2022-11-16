@@ -1,3 +1,5 @@
+6 lines (123 sloc)  5.44 KB
+
 <?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -5,13 +7,6 @@
 <body>
     <?php include "header.php"?>
     <?php include 'request.php';?>
-    <?php
-        if(!gettype($_SESSION['id'])){
-            echo "You are already logged in";
-        } else {
-            echo "You are not logged in";
-        }
-    ?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking
             <?php
