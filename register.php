@@ -16,9 +16,6 @@
 <?php include "footer.php"?>
 </html>
 
-
-
-
 <?php
 function beginRegister(){
     $username = strip_tags($_POST["username"]);

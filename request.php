@@ -34,17 +34,16 @@ function refreshLastConnection(int $userID) {
 function createHabit() {
     $con = openDB();
     if (isset($_POST["description"],$_POST["difficulty"],$_POST["color"],$_POST["time"])){
+        $userID = $_SESSION["id"];
         $description = strip_tags($_POST["description"]);
         $difficulty =strip_tags($_POST["difficulty"]);
         $color = strip_tags($_POST["color"]);
-        $start = date("Y-m-d H:i:s");
+        $start = date("Y-m-d");
         $time = strip_tags($_POST["time"]);
-        $userID = $_SESSION["id"];
         $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
         $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
         $stmt->execute();
-        $stmt = $db->prepare("UPDATE user SET lastAddHabit = $date WHERE id = $userID");
-        $stmt->execute();
+        updateDateHabit($userID);
     }else {
         echo "Please fill all the required fields to add an habit";
     }
@@ -255,5 +254,20 @@ function updateInDB(string $table, string $rowToUpdate,mixed $newValue, string $
     echo "UPDATE `$table` SET `$rowToUpdate` = '$newValue' WHERE $tableCondition = $condition <br>";
     $sql = $db->prepare("UPDATE `$table` SET `$rowToUpdate` = ? WHERE $tableCondition = ?");
     $sql->execute([$newValue,$condition]);
-    mysqli_close($db) ;
+    mysqli_close($db);
+}
+function updateDateHabit($id) {
+    $date = date("Y-m-d");
+    $db = openDB();
+    $stmt = $db->prepare("UPDATE user SET lastAddHabit = ? WHERE id = ?");
+    $stmt->bind_param("ss", $date,$id);
+    $stmt->execute();
+}
+function getRankings() {
+    $con = openDB();
+    $query = "SELECT `name` FROM `group` ORDER BY score";
+    $result = mysqli_query($con, $query);
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo "<div>".$row['name']."</div>";
+    }
 }

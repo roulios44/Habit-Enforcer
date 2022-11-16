@@ -18,7 +18,7 @@
             <p>No Account? <a href="http://localhost/Habit-Enforcer/register.php">Sign in here</a></p><br>
         </div>
     </body>
-    <?php include "footer.php" ;?>
+    <?php include "footer.php";?>
 </html>
 
 <?php 
