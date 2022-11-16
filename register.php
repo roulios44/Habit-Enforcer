@@ -29,8 +29,6 @@
 </html>
 
 
-
-
 <?php
 function beginRegister(){
     if($_SERVER["REQUEST METHOD"] == "POST"){
