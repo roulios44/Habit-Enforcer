@@ -8,12 +8,7 @@ session_start();
     <?php include "head.php" ?>
 <body>
     <?php include "header.php" ?>
-    <form action="" method="POST">
-        <p>Name of the group :</p>
-        <p><input type=text name=groupName></p>
-        <p><input type=submit value="Create Group"></p>
-    </form>
-    <?php beginGroupCreation()?>
+    <?php generatePage() ?>
 </body>
 <?php include "footer.php" ?>
 </html>
@@ -35,6 +30,21 @@ function createGroup(String $groupName){
         $idGroup = dbGroupCreate($groupName,$_SESSION["id"]);
         $_SESSION["groupID"] = $idGroup ;
     }
+}
+
+function generatePage(){
+    if (!is_null($_SESSION["groupID"])){
+        echo "<p>You are already in a group</p>" ;
+    }else if(!is_null($_SESSION["id"])){
+        echo "
+        <form action'' method='POST'>
+            <p>Name of the group :</p>
+            <p><input type=text name=groupName></p>
+            <p><input type=submit value='Create Group'></p>
+        </form>
+        ";
+        beginGroupCreation();
+    } else echo "<p>You have to be connected to acces this page</p>" ;
 }
 
 ?>

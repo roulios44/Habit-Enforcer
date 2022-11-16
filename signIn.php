@@ -6,17 +6,8 @@
     ?>
     <body>
         <?php include "header.php" ?>
-        <div class="form">
-            <form action="" method="POST">
-                <p>Username: <input type="text" name="username"></p>
-                <p>Password: <input type="password" name ="password"></p>
-                <p><input type="submit" value="Connect"></p>
-            </form>
-            <?php BeginSignIn()?>
-        </div>
-        <div class="connectMessage">
-            <p>No Account? <a href="http://localhost/Habit-Enforcer/register.php">Sign in here</a></p><br>
-        </div>
+        <?php generatePage() ?>
+        
     </body>
     <?php include "footer.php" ;?>
 </html>
@@ -45,6 +36,26 @@ function SignIn(String $username, String $password){
             echo "<p>Wrong password, try again</p>" ;
         }
 
+    }
+}
+
+function generatePage(){
+    if (is_null($_SESSION["id"])){
+        echo '
+        <div class="form">
+        <form action="" method="POST">
+            <p>Username: <input type="text" name="username"></p>
+            <p>Password: <input type="password" name ="password"></p>
+            <p><input type="submit" value="Connect"></p>
+        </form>
+        <?php BeginSignIn()?>
+    </div>
+    <div class="connectMessage">
+        <p>No Account? <a href="http://localhost/Habit-Enforcer/register.php">Sign in here</a></p><br>
+    </div>
+        ' ;
+    } else {
+        echo "You are already connected" ;
     }
 }
 ?>

@@ -54,22 +54,21 @@ background-color: #23785E;
 }
 .form{
 background-color: beige;
-  border-radius: 5px;
-  padding: 3%;
-  margin: 3%;
-  width: min-content;
-  align-self: center;
-  box-shadow: 10px 5px 5px grey;
-  border:solid black;
-  align-items: center;
-  align-content: center;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  align-items: stretch;
-  align-content: stretch;
+border-radius: 15px;
+padding: 3%;
+margin: 3%;
+width: min-content;
+align-self: center;
+border:solid black;
+align-items: center;
+align-content: center;
+text-align: center;
+display: flex;
+flex-direction: column;
+flex-wrap: nowrap;
+justify-content: flex-start;
+align-items: stretch;
+align-content: stretch;
 }
 .leftHeader{
   max-height: 100%;

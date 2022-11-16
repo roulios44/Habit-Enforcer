@@ -3,23 +3,32 @@
 <?php include "head.php"?>
 <body>
     <?php include "header.php"?>
-    <div class="form">
-        <form action="register.php" method="POST">
-            <p>Username: <input type="text" name="username"></p>
-            <p>Password: <input type=text name = password></p>
-            <p>E-mail Adress: <input type=text name = mail></p>
-            <p><input type="submit" name="submit" value="Create your profile !"></input></p>
-        </form>
-    </div>
-    <?php beginRegister() ;?>
+    <?php generatePage() ; ?>
+    
 </body>
 <?php include "footer.php"?>
 </html>
 
+<?php 
+function generatePage(){
+    if (!is_null($_SESSION["id"])){
+        echo "<p>You are already connected</p>" ;
+    } else {
+        echo "
+        <div class='form'>
+        <form action='register.php' method='POST'>
+            <p>Username: <input type='text' name='username'></p>
+            <p>Password: <input type='text' name = 'password'></p>
+            <p>E-mail Adress: <input type='text' name = 'mail'></p>
+            <p><input type='submit' name='submit' value='Create your profile !'></input></p>
+        </form>
+        <?php beginRegister() ;?>
+    </div>
+        " ;
+        beginRegister();
+    }
+}
 
-
-
-<?php
 function beginRegister(){
     $username = strip_tags($_POST["username"]);
     $password = strip_tags($_POST["password"]);
