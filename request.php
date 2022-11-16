@@ -79,9 +79,6 @@ function checkPassword(String $username, String $password){
     $result = mysqli_fetch_assoc($resultQuery) ;
     mysqli_close($db) ;
     $verify = password_verify($password, $result["password"]) ;
-    echo $verify ;
-    if($verify)echo "true" ;
-    else echo "false" ;
     if($verify)return true ;
     return false;
 }
@@ -101,7 +98,7 @@ function searchUser(String $usernameSearch):array | bool{
     mysqli_close($db) ;
     return $resultArray;
 }
-function dbGroupCreate(String $groupName, int $ownerID){
+function dbGroupCreate(String $groupName, int $ownerID) : int{
     $arrayMembers = json_encode([$ownerID]) ;
     $db = openDB();
     $sql = $db->prepare("INSERT INTO `group` (name,ownerID,members) VALUES (?,?,?)");
@@ -110,6 +107,7 @@ function dbGroupCreate(String $groupName, int $ownerID){
     $groupID = $db->insert_id;
     mysqli_close($db) ;
     addUserGroup($groupID, $ownerID) ;
+    return $groupID;
 }
 
 function completeTask(int $done, int $id) {
@@ -235,5 +233,16 @@ function updateInDB(string $table, string $rowToUpdate,mixed $newValue, string $
     echo "UPDATE `$table` SET `$rowToUpdate` = '$newValue' WHERE $tableCondition = $condition <br>";
     $sql = $db->prepare("UPDATE `$table` SET `$rowToUpdate` = ? WHERE $tableCondition = ?");
     $sql->execute([$newValue,$condition]);
+    mysqli_close($db) ;
+}
+
+function destroyGroup(int $groupID){
+    $members = json_decode(getInDB("members", "group","id", $groupID)["members"]) ;
+    foreach($members as $memberID){
+        updateInDB("user","groupID",NULL,"id",$memberID);
+    }
+    $db = openDB();
+    $sql = $db->prepare("DELETE FROM `group` WHERE id = ?");
+    $sql->execute([$groupID]);
     mysqli_close($db) ;
 }
