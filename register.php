@@ -9,10 +9,12 @@ class Register extends Request {
             echo "
             <div class='form'>
             <form action='register.php' method='POST'>
-                <p>Username: <input type='text' name='username'></p>
-                <p>Password: <input type='text' name = 'password'></p>
-                <p>E-mail Adress: <input type='text' name = 'mail'></p>
-                <p><input type='submit' name='submit' value='Create your profile !'></input></p>
+                <input type='text' name='username' placeholder='username'>
+                <input type='text' name = 'password' placeholder='password'>
+                <input type='text' name = 'mail' placeholder='email'>
+                <div class='connectButton'>
+                <input type='submit' name='submit' value='Create your profile !'></input></p>
+                </div>
             </form>
             <?php beginRegister() ;?>
         </div>
@@ -26,7 +28,7 @@ class Register extends Request {
         $password = strip_tags($_POST["password"]);
         $mail = strip_tags($_POST["mail"]);
         if(empty($username) || empty($password) || empty($mail)){
-            echo "Please fill all fields please<br>";
+            echo "<p>Please fill all fields please</p><br>";
         } else {
             $this->register();
         }

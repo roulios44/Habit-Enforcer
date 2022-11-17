@@ -247,4 +247,13 @@ abstract class Request{
         $sql->execute([$groupID]);
         mysqli_close($db) ;
     }
+
+    protected function getRankings() {
+        $con = $this->openDB();
+        $query = "SELECT `name` FROM `group` ORDER BY score";
+        $result = mysqli_query($con, $query);
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<div>".$row['name']."</div>";
+        }
+    }
 }

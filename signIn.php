@@ -30,9 +30,11 @@ function generatePage(){
         echo '
         <div class="form">
         <form action="" method="POST">
-        <p>Username: <input type="text" name="username"></p>
-        <p>Password: <input type="password" name ="password"></p>
-        <p><input type="submit" value="Connect"></p>
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name ="password" placeholder="Password">
+        <div class="connectButton">
+        <input type="submit" value="Connect">
+        </div>
         </form>
         <?php BeginSignIn()?>
         </div>
@@ -53,7 +55,7 @@ function generatePage(){
     include "head.php"
     ?>
     <body>
-        <?php include "header.php" ;
+        <?php
         $login = new Login;
         $login->generatePage() ?>
         
