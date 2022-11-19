@@ -4,7 +4,7 @@ session_start() ;
 class Register extends Request {
     public function generatePage(){
         if (!is_null($_SESSION["id"])){
-            echo "<p>You are already connected</p>" ;
+           header('Location: main.php') ;
         } else {
             echo "
             <div class='form'>
