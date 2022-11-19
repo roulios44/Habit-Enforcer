@@ -126,8 +126,8 @@
                     ?>
                 </div>
             </div>
-            <?php $requests->addHabit():?>
-            <?php $requests->generateGroup();?>
+            <?php $requests->addHabit() ?>
+            <?php $requests->generateGroup() ?>
             <?php $requests->generateHabit() ?>
         </div>
         <div id="toDo" name="toDo" class="toDo" class="aColumn">To Do
