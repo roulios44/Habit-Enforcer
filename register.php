@@ -66,4 +66,40 @@ class Register extends Request {
     ?>
 </body>
 <?php include "footer.php"?>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+
+<?php
+function beginRegister(){
+    $username = strip_tags($_POST["username"]);
+    $password = strip_tags($_POST["password"]);
+    $mail = strip_tags($_POST["mail"]);
+    if(empty($username) || empty($password) || empty($mail)){
+        echo "Please fill all fields please<br>";
+    } else {
+        register();
+    }
+}
+function register(){
+    require("request.php") ;
+    $alreadyUse = false;
+    $username = strip_tags($_POST["username"]);
+    $password = strip_tags( $_POST["password"]);
+    $mail = strip_tags($_POST["mail"]);
+    if ((alreadyExist($username,"user","username"))){
+        echo "username '$username' is already use, please chose another one <br>" ;
+        $alreadyUse = true;
+    }
+    if (alreadyExist($mail,"user","email")){
+        echo "mail '$mail' is already use for a account <br>";
+        $alreadyUse = true;
+    }
+    if(!$alreadyUse){
+        addUserDB($username,$mail,$password);
+        header('Location: signIn.php');
+    }
+}
+?>
+>>>>>>> 8940a7b644e92c9b21324da7620d1a6361daf95c
