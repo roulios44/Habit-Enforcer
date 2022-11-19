@@ -44,6 +44,8 @@ abstract class Request{
             $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
             $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
             $stmt->execute();
+            $this->updateInDB("user","lastAddHabit",date('Y-m-d'),"id",$userID);
+            $this->updateDateHabit($userID) ;
         }else {
             echo "Please fill all the required fields to add an habit";
         }
@@ -167,11 +169,7 @@ abstract class Request{
     protected function updateGroupMembers(int $groupID, int $userID){
         $groupMember = json_decode($this->getInDB("members","group","id",$groupID)["members"]);
         if (!in_array($userID,$groupMember))array_push($groupMember, $userID);
-        $con = $this->openDB();
-        $stmt = $con->prepare("UPDATE `group` SET members = ? WHERE id = ?");
-        $stmt->bind_param("si", json_encode($groupMember) , $groupID);
-        $stmt->execute();
-        mysqli_close($con) ;
+        $this->updateInDB("group","members",json_encode($groupMember),"id",$groupID) ;
     }
     
     protected function getGroupInfo(int $groupID) : array{
@@ -194,11 +192,13 @@ abstract class Request{
     
     protected function inviteUserGroup(int $userID, int $groupID){
         $invites = json_decode($this->getInDB("inviteGroup","user","id",$userID)["inviteGroup"]) ;
-        if(!in_array($groupID,$invites)){
-            array_push($invites,$groupID) ;
-            $db = $this->openDB();
-            $sql = $db->prepare("UPDATE user SET inviteGroup = ? WHERE id = ?") ;
-            $sql->execute([json_encode($invites),$userID]);
+        if(gettype($invites)!= "NULL"){
+            if(!in_array($groupID,$invites)){
+                array_push($invites,$groupID) ;
+                $db = $this->openDB();
+                $sql = $db->prepare("UPDATE user SET inviteGroup = ? WHERE id = ?") ;
+                $sql->execute([json_encode($invites),$userID]);
+            }
         }
     }
     protected function habitExpire(int $id) {
@@ -255,5 +255,20 @@ abstract class Request{
         while ($row = mysqli_fetch_assoc($result)) {
             echo "<div>".$row['name']."</div>";
         }
+    }
+
+    protected function deleteTask($id) {
+        $db = $this->openDB();
+        $stmt = $db->prepare("DELETE FROM habit WHERE id = ?");
+        $stmt->bind_param("s", $id);
+        $stmt->execute();
+    }
+
+    protected function updateDateHabit($id) {
+        $date = date("Y-m-d");
+        $db = $this->openDB();
+        $stmt = $db->prepare("UPDATE user SET lastAddHabit = ? WHERE id = ?");
+        $stmt->bind_param("ss", $date,$id);
+        $stmt->execute();
     }
 }

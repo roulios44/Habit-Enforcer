@@ -1,4 +1,3 @@
-<?php session_start() ?>
 <div class="header">
     <div class="leftHeader">
         <p>left Header</p>
@@ -8,6 +7,9 @@
     </div>
     <div class="rightHeader">
         <p>right Header</p>
+        <form action="main.php">
+            <input type="submit" value="HOME">
+        </form>
     </div>
 </div>
 

@@ -83,7 +83,7 @@ background-color: #eda630;
 .connectButton input{
   background-color:#eda630 ;
   border: none;
-  line-height: 100%;
+  height: 50px;
 }
 
 

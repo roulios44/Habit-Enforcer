@@ -26,6 +26,7 @@ function SignIn(String $username, String $password){
 }
 
 function generatePage(){
+    print_r($_SESSION) ;
     if (is_null($_SESSION["id"])){
         echo '
         <div class="form">
@@ -36,7 +37,6 @@ function generatePage(){
         <input type="submit" value="Connect">
         </div>
         </form>
-        <?php BeginSignIn()?>
         </div>
         <div class="connectMessage">
         <p>No Account? <a href="http://localhost/Habit-Enforcer/register.php">Sign in here</a></p><br>
@@ -44,7 +44,7 @@ function generatePage(){
         ' ;
         $this->BeginSignIn();
     } else {
-        echo "You are already connected" ;
+        header('Location: main.php') ;
     }
 }
 }
