@@ -1,3 +1,29 @@
+<?php 
+require_once "request.php" ;
+session_start() ;
+class Header extends Request{
+
+    public function generateHeader(){
+        if (session_status() === PHP_SESSION_ACTIVE){
+            echo "<div id=manageAccount>";
+            echo "<form method=POST id=deconnexionForm><input type=submit name=deconnect value=Deconnexion></form>";
+            echo "<form method=POST id=deleteAccount><input type=submit name=deleteAccount value=Delete&nbsp;account></form>";
+            echo "</div>";
+        }
+        if (isset($_POST["deconnect"]) || isset($_POST["deleteAccount"])) {
+            if (isset($_POST["deleteAccount"])) {
+                $this->deleteAccount($_SESSION['id']);
+                $this->deleteTask("userID",$_SESSION['id']);
+            }
+            $this->refreshLastConnection($_SESSION['id']);
+            session_unset();
+            session_destroy();
+            header('Location: signIn.php');
+        }
+    }
+}
+$header = new Header ;
+?>
 <div class="header">
     <div class="leftHeader">
         <p>left Header</p>
@@ -10,23 +36,7 @@
     <div class="rightHeader">
         <p>right Header</p>
         
-        <?php
-        if (session_status() === PHP_SESSION_ACTIVE){
-            echo "<div id=manageAccount>";
-            echo "<form method=POST id=deconnexionForm><input type=submit name=deconnect value=Deconnexion></form>";
-            echo "<form method=POST id=deleteAccount><input type=submit name=deleteAccount value=Delete&nbsp;account></form>";
-            echo "</div>";
-        }
-        if (isset($_POST["deconnect"]) || isset($_POST["deleteAccount"])) {
-            if (isset($_POST["deleteAccount"])) {
-                require_once "request.php";
-                // deleteAccount($_SESSION['id']);
-            }
-            session_unset();
-            session_destroy();
-            header('Location: signIn.php');
-        }
-        ?>
+        <?php $header->generateHeader() ;?>
     </div>
     <?php 
         

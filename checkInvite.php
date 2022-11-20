@@ -28,7 +28,10 @@ class checkInvite extends Request{
     }
     
     function acceptInvite(){
-        if ($_POST["groupID"])$this->addUserGroup(strip_tags($_POST["groupID"]),$_SESSION["id"]);
+        if ($_POST["groupID"]){
+            $this->addUserGroup(strip_tags($_POST["groupID"]),$_SESSION["id"]);
+            header('Location: main.php') ;
+        }
     }
 }
 ?>
