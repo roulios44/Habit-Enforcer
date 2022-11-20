@@ -45,7 +45,7 @@ abstract class Request{
             $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
             $stmt->execute();
             $this->updateInDB("user","lastAddHabit",date('Y-m-d'),"id",$userID);
-            $this->updateDateHabit($userID) ;
+            $this->updateInDB("user","lastAddHabit",date("Y-m-d"),"id",$userID) ;
         }else {
             echo "Please fill all the required fields to add an habit";
         }
@@ -120,14 +120,11 @@ abstract class Request{
         $stmt->execute();
         $resultQuery = $stmt->get_result();
         $row = $resultQuery->fetch_assoc();
-        $stmt = $con->prepare("UPDATE habit SET isDone = ? WHERE id = ?");
-        $stmt->bind_param("ss",$done, $id);
-        $stmt->execute();
+        $this->updateInDB("habit","isDone",$done,"id",$id) ;
         if ($row['isDone'] != $done) {
             $score = $this->defineScoreUpdate($done, $row['difficulty'],"instantManaging");
-            $stmt = $con->prepare("UPDATE user SET score = score+? WHERE id = ?");
-            $stmt->bind_param("ss",$score, $row['userID']);
-            $stmt->execute();
+            $currentScore = $this->getInDB("score", "user","id",$row['userID'])["score"] ;
+            $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
         }
         mysqli_close($con) ;
     }
@@ -195,9 +192,7 @@ abstract class Request{
         if(gettype($invites)!= "NULL"){
             if(!in_array($groupID,$invites)){
                 array_push($invites,$groupID) ;
-                $db = $this->openDB();
-                $sql = $db->prepare("UPDATE user SET inviteGroup = ? WHERE id = ?") ;
-                $sql->execute([json_encode($invites),$userID]);
+                $this->updateInDB("user","inviteGroup", $invites,"id",$userID) ;
             }
         }
     }
@@ -214,9 +209,8 @@ abstract class Request{
         if (($row['time']=="daily" && $nbDaysBetween >= 1) ||($row['time']=="weekly" && $nbDaysBetween >= 7)) {
             if ($row['isDone'] == 0) {
                 $score = $this->defineScoreUpdate($row['isDone'], $row['difficulty'], "withTimeManaging")*$nbDaysBetween;
-                $stmt = $db->prepare("UPDATE user SET score = score+? WHERE id = ?");
-                $stmt->bind_param("ss",$score, $row['userID']);
-                $stmt->execute();
+                $currentScore = $this->getInDB("score","user","id",$row["userID"])["score"] ;
+                $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
             }
             $this->resetTime($date, $id);
         }
@@ -231,7 +225,6 @@ abstract class Request{
     }
     protected function updateInDB(string $table, string $rowToUpdate,mixed $newValue, string $tableCondition ,string $condition){
         $db = $this->openDB();
-        echo "UPDATE `$table` SET `$rowToUpdate` = '$newValue' WHERE $tableCondition = $condition <br>";
         $sql = $db->prepare("UPDATE `$table` SET `$rowToUpdate` = ? WHERE $tableCondition = ?");
         $sql->execute([$newValue,$condition]);
         mysqli_close($db) ;
@@ -261,14 +254,6 @@ abstract class Request{
         $db = $this->openDB();
         $stmt = $db->prepare("DELETE FROM habit WHERE id = ?");
         $stmt->bind_param("s", $id);
-        $stmt->execute();
-    }
-
-    protected function updateDateHabit($id) {
-        $date = date("Y-m-d");
-        $db = $this->openDB();
-        $stmt = $db->prepare("UPDATE user SET lastAddHabit = ? WHERE id = ?");
-        $stmt->bind_param("ss", $date,$id);
         $stmt->execute();
     }
 }

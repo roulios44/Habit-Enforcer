@@ -30,7 +30,7 @@ class mainPage extends Request{
         
         $date = date("Y-m-d");
         $lastAddHabit = $this->getInDB("lastAddHabit", "user","id",$_SESSION["id"])["lastAddHabit"];
-        $nbDaysBetween = (strtotime($date)-strtotime($lastAddHabit)/86400) ;
+        $nbDaysBetween = ((strtotime($date)-strtotime($lastAddHabit))/86400) ;
         if ($nbDaysBetween >1) {
             $this->createHabit();
         } else {
@@ -79,7 +79,7 @@ class mainPage extends Request{
         }
     }
 
-    public function findAName(){
+    public function groupInfo(){
         $con = $this->openDB();
         $groupID = $this->getInDB("groupID","user","id",$_SESSION["id"])["groupID"];
         if ($groupID != null) {
@@ -119,7 +119,6 @@ class mainPage extends Request{
             <div id="habits" name="habits" class="habits" class="aColumn">Habits
                 <button id="openModal">Create habit</button>
                 <div id="modal" class="modal">
-                    <?php echo "hi" ?>
                     <div class="modal-content">
                         <span class="close">&times;</span>
                         <form method="POST">
@@ -162,7 +161,7 @@ class mainPage extends Request{
         </div>
         <div id="group" name="group" class="group" class="aColumn">Group
             <?php 
-                $main->findAName();
+                $main->groupInfo();
             ?>
         </div>
     </div>

@@ -2,16 +2,15 @@
     <div class="leftHeader">
         <p>left Header</p>
         <div>
-            <?php disconnect() ?>
+        <form action="main.php">
+            <input type="submit" value="HOME">
+        </form>
         </div>
     </div>
     <div class="rightHeader">
         <p>right Header</p>
-        <form action="main.php">
-            <input type="submit" value="HOME">
-        </form>
-    </div>
-    <?php 
+        
+        <?php
         if (session_status() === PHP_SESSION_ACTIVE){
             echo "<div id=manageAccount>";
             echo "<form method=POST id=deconnexionForm><input type=submit name=deconnect value=Deconnexion></form>";
@@ -27,6 +26,10 @@
             session_destroy();
             header('Location: signIn.php');
         }
+        ?>
+    </div>
+    <?php 
+        
     ?>
 </div>
 
