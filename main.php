@@ -6,9 +6,10 @@ class mainPage extends Request{
 
     public function checkIfConnected(){
         if(is_null($_SESSION["id"]))header('Location: signIn.php') ;
+        $this->refreshLastConnection($_SESSION["id"]);
     }
 
-    public function checkIfGroup(){
+    public function userNavigation(){
         if (isset($_POST["viewInvite"])) {
             header('Location: checkInvite.php');
             } else if (isset($_POST["createGroup"])) {
@@ -92,7 +93,7 @@ class mainPage extends Request{
             $stmt->execute();
             $result = $stmt->get_result();
             while ($row = mysqli_fetch_assoc($result)) {
-                $date = date("Y-m-d H:i:s");
+                $date = date("Ymdhi");
                 $previousScore = $this->getInDB("score", "score", "userID = $row[id] AND `date`", $userInfo['lastConnection']);
                 $score = $this->getInDB("score", "score", "userID = $row[id] AND `date`", $date);
                 if ($previousScore == null) {
@@ -128,7 +129,7 @@ class mainPage extends Request{
     <?php                 
         $main = new mainPage;
         $main->checkIfConnected();
-        $main->checkIfGroup();
+        $main->userNavigation();
     ?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn"><h1>Ranking</h1>
@@ -142,8 +143,8 @@ class mainPage extends Request{
                     <div class="modal-content">
                         <span class="close">&times;</span>
                         <form method="POST">
-                            <p>Description :</p><input type="text" id="description" name="description">
-                            <div class="star-widget"><p>Difficulty :</p>
+                            Description :<input type="text" id="description" name="description">
+                            <div class="star-widget">Difficulty :
                                 <input type="radio" name="difficulty" id="difficulty-5" value="5">
                                 <label for="difficulty-5" class="fas fa-star"></label>
                                 <input type="radio" name="difficulty" id="difficulty-4" value="4">
@@ -155,8 +156,8 @@ class mainPage extends Request{
                                 <input type="radio" name="difficulty" id="difficulty-1" value="1">
                                 <label for="difficulty-1" class="fas fa-star"></label>
                             </div>
-                            <p>Color :</p><input type="color" name="color" value="#333333" list="colors">
-                            <p>Period of time :</p> <select name="time" id="time">
+                            Color :<input type="color" name="color" value="#333333" list="colors">
+                            Period of time : <select name="time" id="time">
                                 <option value="daily">Daily</option>
                                 <option value="weekly">Weekly</option>
                             </select>

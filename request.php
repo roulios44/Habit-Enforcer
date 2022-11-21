@@ -111,7 +111,7 @@ abstract class Request{
         mysqli_close($db) ;
         $this->addUserGroup($groupID, $ownerID) ;
         $this->deleteTask("userID", $ownerID);
-        $this->updateInDB("user","score","0","id",$ownerID) ;
+        $this->resetScore($ownerID);
         return $groupID;
     }
     
@@ -155,6 +155,12 @@ abstract class Request{
         if (in_array($groupId,$arrayGroupInvite))return true;
         return false;
     }
+
+    protected function resetScore($id) {
+        $con = $this->openDB();
+        $stmt = $con->prepare("UPDATE user SET score = 0 WHERE id = $id");
+        $stmt->execute();
+    }
     
     protected function addUserGroup(int $groupID, int $userID){
         $con = $this->openDB();
@@ -168,10 +174,23 @@ abstract class Request{
         $this->deleteTask("userID", $userID);
 
     }
+    protected function addNewScore($id) {
+        $db = $this->openDB();
+        $score = $this->getInDB("score", "user","id", $id);
+        $date = date("Ymdhi");
+        $stmt = $db->prepare("INSERT INTO score (score, userID, `date`) VALUES (?,?,?)");
+        $stmt->bind_param("sss",$score['score'], $id, $date);
+        $stmt->execute();
+    }
     
     protected function updateGroupMembers(int $groupID, int $userID){
         $groupMember = json_decode($this->getInDB("members","group","id",$groupID)["members"]);
         if (!in_array($userID,$groupMember))array_push($groupMember, $userID);
+        else{
+            $groupMember = array_filter($groupMember, function ($elem) use ($userID) {
+                return $elem != $userID ;
+            }) ;
+        }
         $this->updateInDB("group","members",json_encode($groupMember),"id",$groupID) ;
     }
     
@@ -187,7 +206,8 @@ abstract class Request{
     protected function getInDB(string $toSelect, string $table, string $rowToSearch, string|int $condition){
         $db = $this->openDB();
         $sql = $db->prepare("SELECT $toSelect FROM `$table` WHERE $rowToSearch = ?");
-        $sql->execute([$condition]);
+        $sql->bind_param("s", $condition);
+        $sql->execute();
         $resultQuery = $sql->get_result();
         mysqli_close($db) ;
         return mysqli_fetch_assoc($resultQuery) ;
@@ -202,36 +222,28 @@ abstract class Request{
             }
         }
     }
-    protected function habitExpire() {
+
+    protected function habitExpire(int $id) {
         $db = $this->openDB();
         $date = date("Y-m-d");
         $stmt = $db->prepare("SELECT `start`, `time`, isDone, difficulty, userID FROM habit");
         $stmt->execute();
         $resultQuery = $stmt->get_result();
-        while ($row = mysqli_fetch_assoc($resultQuery)) {
-            $habitDate = $row['start'];
-            $nbDaysBetween = (strtotime($date)-strtotime($habitDate))/86400;
-            if (($row['time']=="daily" && $nbDaysBetween >= 1) ||($row['time']=="weekly" && $nbDaysBetween >= 7)) {
-                if ($row['isDone'] == 0) {
-                    $score = $this->defineScoreUpdate($row['isDone'], $row['difficulty'], "withTimeManaging")*$nbDaysBetween;
-                    $stmt = $db->prepare("UPDATE user SET score = score+? WHERE id = ?");
-                    $stmt->bind_param("ss",$score, $row['userID']);
-                    $stmt->execute();
-                    $this->addNewScore($row['userID']);
-                }
-                $this->resetTime($date);
+        $row = $resultQuery->fetch_assoc();
+        $date = date("Y-m-d");
+        $habitDate = $row['start'];
+        $nbDaysBetween = (strtotime($date)-strtotime($habitDate))/86400;
+        if (($row['time']=="daily" && $nbDaysBetween >= 1) ||($row['time']=="weekly" && $nbDaysBetween >= 7)) {
+            if ($row['isDone'] == 0) {
+                $score = $this->defineScoreUpdate($row['isDone'], $row['difficulty'], "withTimeManaging")*$nbDaysBetween;
+                $currentScore = $this->getInDB("score","user","id",$row["userID"])["score"] ;
+                $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
+                $this->addNewScore($row['userID']);
             }
         }
     }
 
-    protected function addNewScore($id) {
-        $db = $this->openDB();
-        $score = $this->getInDB("score", "user","id", $id);
-        $date = date("Y-m-d H:i:s");
-        $stmt = $db->prepare("INSERT INTO score (score,userID,`date`) VALUES (?,?,?)");
-        $stmt->bind_param("sss",$score['score'], $id, $date);
-        $stmt->execute();
-    }
+    
     
     function resetTime($date) {
         $db = $this->openDB();
@@ -266,9 +278,9 @@ abstract class Request{
         }
     }
 
-    protected function deleteTask($id) {
+    protected function deleteTask($condition, $id) {
         $db = $this->openDB();
-        $stmt = $db->prepare("DELETE FROM habit WHERE id = ?");
+        $stmt = $db->prepare("DELETE FROM habit WHERE $condition = ?");
         $stmt->bind_param("s", $id);
         $stmt->execute();
     }
@@ -287,11 +299,15 @@ abstract class Request{
         $sql2->execute();
     }
 
-    protected function deleteAccount($id) {
+    protected function deleteAccount(int $userID,int $groupID) {
+        if(!is_null($groupID)){
+            $groupOwnerID = $this->getInDB("ownerID", "group","id",$groupID)["ownerID"] ;
+            if($groupOwnerID == $userID)$this->destroyGroup($groupID) ;
+            else $this->updateGroupMembers($groupID,$userID) ;
+        }
         $db = $this->openDB();
         $stmt = $db->prepare("DELETE FROM user WHERE id = ?");
-        $stmt->bind_param("s", $id);
-        $stmt->execute();
+        $stmt->execute([$userID]);
         mysqli_close($db) ;
     }
 }

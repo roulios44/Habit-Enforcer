@@ -1,5 +1,5 @@
 <?php require_once "request.php" ;
-
+session_start() ;
 class Login extends Request{
     public function BeginSignIn(){
         if(empty($_POST["username"]) || empty($_POST["password"]))echo "<p>Please fill all fields please</p><br>";
@@ -22,7 +22,7 @@ class Login extends Request{
     }
 
     public function generatePage(){
-        if (is_null($_SESSION["id"])){
+        if (!isset($_SESSION["id"])){
             echo '
             <div class="form">
             <h1>Login</h1>

@@ -1,6 +1,5 @@
 <?php 
 require_once "request.php" ;
-session_start() ;
 class Header extends Request{
 
     public function generateHeader(){
@@ -12,7 +11,7 @@ class Header extends Request{
         }
         if (isset($_POST["deconnect"]) || isset($_POST["deleteAccount"])) {
             if (isset($_POST["deleteAccount"])) {
-                $this->deleteAccount($_SESSION['id']);
+                $this->deleteAccount($_SESSION['id'],$_SESSION["groupID"]);
                 $this->deleteTask("userID",$_SESSION['id']);
             }
             $this->refreshLastConnection($_SESSION['id']);

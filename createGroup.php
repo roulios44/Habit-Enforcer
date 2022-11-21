@@ -3,11 +3,10 @@ require "request.php";
 session_start();
 class groupCreate extends Request{
     function beginGroupCreation(){
-        $groupName = strip_tags($_POST["groupName"]);
-        if(empty($groupName))echo "Please enter a name of group";
-        elseif(strlen($groupName)>25)echo "Max size of name : 25 characters" ;
+        if(empty($_POST["groupName"]))echo "Please enter a name of group";
+        elseif(strlen($_POST["groupName"])>25)echo "Max size of name : 25 characters" ;
         else{
-            $this->createGroup($groupName);
+            $this->createGroup(strip_tags($_POST["groupName"]));
         }
     }
     
