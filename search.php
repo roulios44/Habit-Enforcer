@@ -2,14 +2,14 @@
 session_start() ;
 
 class Search extends Request{
-    function beginSearch(){
+    public function beginSearch(){
         if(!empty($_POST["search"]))$this->inviteUser($_POST["search"]);
         $searchValue =strip_tags($_POST['searchUser']) ;
         if(!empty($searchValue)){
             $this->search($searchValue);
         }
     }
-    function search(String $searchValue){
+    private function search(String $searchValue){
         $userFound = $this->searchUser($searchValue) ;
         if($userFound === false)echo "<p>No user with this pseudo has been found.</p>" ;
         else{
@@ -22,7 +22,7 @@ class Search extends Request{
         }
     }
     
-    function createUserResultCard(array $user,string $search){
+    private function createUserResultCard(array $user,string $search){
         $username = $user["username"] ;
         $id = $user["id"];
         $inviteMessage = $this->getInviteMessage($id);
@@ -36,14 +36,14 @@ class Search extends Request{
         </div>" ;
     }
     
-    function inviteUser(string $search){
+    private function inviteUser(string $search){
         if(!empty($_POST["idUser"])){
             $this->inviteUserGroup(strip_tags($_POST["idUser"]), $_SESSION["groupID"]);
             $this->search($search);
         }
     }
     
-    function getInviteMessage(int $userID) : string{
+    private function getInviteMessage(int $userID) : string{
         if (!$_SESSION["id"])return "<p>You have to be connected to invite some one to a group</p>" ;
         if (is_null($_SESSION["groupID"]))return "<p>You are not in a group, join one to invite a user to a group</p>" ;
         else if($this->getInDB("groupID","user","id",$userID)["groupID"])return "<p>Already in a groupe</p>" ;
