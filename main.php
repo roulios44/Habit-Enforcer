@@ -6,9 +6,10 @@ class mainPage extends Request{
 
     public function checkIfConnected(){
         if(is_null($_SESSION["id"]))header('Location: signIn.php') ;
+        $this->refreshLastConnection($_SESSION["id"]);
     }
 
-    public function checkIfGroup(){
+    public function userNavigation(){
         if (isset($_POST["viewInvite"])) {
             header('Location: checkInvite.php');
             } else if (isset($_POST["createGroup"])) {
@@ -81,16 +82,35 @@ class mainPage extends Request{
 
     public function groupInfo(){
         $con = $this->openDB();
-        $groupID = $this->getInDB("groupID","user","id",$_SESSION["id"])["groupID"];
-        if ($groupID != null) {
-            echo "<div id=totalScore> Total score =".$this->getInDB("score","group","id" ,$groupID)["score"]." </div>";
+        $userInfo = $this->getInDB("groupID, lastConnection","user","id",$_SESSION["id"]);
+        if ($userInfo['groupID'] != null) {
+            $this->updateGroupScore($userInfo['groupID']);
+            echo "<div id=totalScore> Total score =".$this->getInDB("score","group","id" ,$userInfo['groupID'])['score']." </div>";
             echo "<form method=POST id=invite><input type=submit name=invite value=invite people></form>";
-            $stmt = $con->prepare("SELECT username FROM user WHERE groupID = ?");
-            $stmt->bind_param("s",$groupID);
+            $stmt = $con->prepare("SELECT username, id, lastConnection FROM user WHERE groupID = ?");
+            $stmt->bind_param("s",$userInfo['groupID']);
             $stmt->execute();
             $result = $stmt->get_result();
             while ($row = mysqli_fetch_assoc($result)) {
-                echo "<div>".$row['username']."</div>";
+                $date = date("Ymdhi");
+                $previousScore = $this->getInDB("score", "score", "userID = $row[id] AND `date`", $userInfo['lastConnection']);
+                $score = $this->getInDB("score", "score", "userID = $row[id] AND `date`", $date);
+                if ($previousScore == null) {
+                    $previousScore['score'] = 0;
+                } if ($score == null) {
+                    $score['score'] =0;
+                }
+                $score['score'] = $score['score'] - $previousScore['score'];
+                $lost = "won";
+                if ($score['score'] < 0) {
+                    $lost = "lost";
+                    $score['score'] = abs($score['score']);
+                }
+                if ($row['username'] == $_SESSION['username']) {
+                    echo "<div> You ".$lost." ".$score['score']." point(s) since last connection</div>";
+                } else {
+                    echo "<div>".$row['username']." ".$lost." ".$score['score']." point(s) since last connection</div>";
+                }
             }
         } else {
                 echo "<div id=totalScore> Total score =".$this->getInDB("score","user","id" ,$_SESSION["id"])["score"]." </div>";
@@ -108,7 +128,7 @@ class mainPage extends Request{
     <?php                 
         $main = new mainPage;
         $main->checkIfConnected();
-        $main->checkIfGroup();
+        $main->userNavigation();
     ?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking

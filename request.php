@@ -110,6 +110,8 @@ abstract class Request{
         $groupID = $db->insert_id;
         mysqli_close($db) ;
         $this->addUserGroup($groupID, $ownerID) ;
+        $this->deleteTask("userID", $ownerID);
+        $this->resetScore($ownerID);
         return $groupID;
     }
     
@@ -125,6 +127,7 @@ abstract class Request{
             $score = $this->defineScoreUpdate($done, $row['difficulty'],"instantManaging");
             $currentScore = $this->getInDB("score", "user","id",$row['userID'])["score"] ;
             $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
+            $this->addNewScore($row['userID']);
         }
         mysqli_close($con) ;
     }
@@ -152,6 +155,12 @@ abstract class Request{
         if (in_array($groupId,$arrayGroupInvite))return true;
         return false;
     }
+
+    protected function resetScore($id) {
+        $con = $this->openDB();
+        $stmt = $con->prepare("UPDATE user SET score = 0 WHERE id = $id");
+        $stmt->execute();
+    }
     
     protected function addUserGroup(int $groupID, int $userID){
         $con = $this->openDB();
@@ -161,6 +170,27 @@ abstract class Request{
         $stmt->execute();
         mysqli_close($con) ;
         $this->updateGroupMembers($groupID,$userID) ;
+    }
+    protected function updateGroupScore($groupID) {
+        $groupScore = 0;
+        $con = $this->openDB();
+        $sql = $con->prepare("SELECT `score` FROM user WHERE groupID = $groupID");
+        $sql->execute();
+        $result = $sql->get_result();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $groupScore+=$row['score'];
+        }
+        $sql2 = $con->prepare("UPDATE `group` SET score = ? WHERE id = ?");
+        $sql2->bind_param("ss", $groupScore, $groupID);
+        $sql2->execute();
+    }
+    protected function addNewScore($id) {
+        $db = $this->openDB();
+        $score = $this->getInDB("score", "user","id", $id);
+        $date = date("Ymdhi");
+        $stmt = $db->prepare("INSERT INTO score (score, userID, `date`) VALUES (?,?,?)");
+        $stmt->bind_param("sss",$score['score'], $id, $date);
+        $stmt->execute();
     }
     
     protected function updateGroupMembers(int $groupID, int $userID){
@@ -181,7 +211,8 @@ abstract class Request{
     protected function getInDB(string $toSelect, string $table, string $rowToSearch, string|int $condition){
         $db = $this->openDB();
         $sql = $db->prepare("SELECT $toSelect FROM `$table` WHERE $rowToSearch = ?");
-        $sql->execute([$condition]);
+        $sql->bind_param("s", $condition);
+        $sql->execute();
         $resultQuery = $sql->get_result();
         mysqli_close($db) ;
         return mysqli_fetch_assoc($resultQuery) ;
@@ -192,10 +223,11 @@ abstract class Request{
         if(gettype($invites)!= "NULL"){
             if(!in_array($groupID,$invites)){
                 array_push($invites,$groupID) ;
-                $this->updateInDB("user","inviteGroup", $invites,"id",$userID) ;
+                $this->updateInDB("user","inviteGroup", json_encode($invites),"id",$userID) ;
             }
         }
     }
+
     protected function habitExpire(int $id) {
         $db = $this->openDB();
         $stmt = $db->prepare("SELECT `start`, `time`, isDone, difficulty, userID FROM habit WHERE id = ?");
@@ -211,6 +243,7 @@ abstract class Request{
                 $score = $this->defineScoreUpdate($row['isDone'], $row['difficulty'], "withTimeManaging")*$nbDaysBetween;
                 $currentScore = $this->getInDB("score","user","id",$row["userID"])["score"] ;
                 $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
+                $this->addNewScore($row['userID']);
             }
             $this->resetTime($date, $id);
         }
@@ -224,6 +257,7 @@ abstract class Request{
         mysqli_close($db) ;
     }
     protected function updateInDB(string $table, string $rowToUpdate,mixed $newValue, string $tableCondition ,string $condition){
+        echo gettype($newValue) ;
         $db = $this->openDB();
         $sql = $db->prepare("UPDATE `$table` SET `$rowToUpdate` = ? WHERE $tableCondition = ?");
         $sql->execute([$newValue,$condition]);
@@ -250,9 +284,9 @@ abstract class Request{
         }
     }
 
-    protected function deleteTask($id) {
+    protected function deleteTask($condition, $id) {
         $db = $this->openDB();
-        $stmt = $db->prepare("DELETE FROM habit WHERE id = ?");
+        $stmt = $db->prepare("DELETE FROM habit WHERE $condition = ?");
         $stmt->bind_param("s", $id);
         $stmt->execute();
     }

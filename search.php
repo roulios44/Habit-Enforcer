@@ -15,6 +15,7 @@ class Search extends Request{
         else{
             echo "<div class='container'>" ;
             for($i=0;$i<sizeOf($userFound);$i++){
+                if($userFound[$i]["id"] == $_SESSION["id"])continue ;
                 $this->createUserResultCard($userFound[$i], $searchValue);
             }
             echo "</div>" ;
@@ -57,17 +58,10 @@ class Search extends Request{
     <?php include "head.php"?>
     <?php include "header.php"?>
     <?php
-        if(!gettype($_SESSION['id'])){
+        if(!$_SESSION['id']){
             echo "<p>You have to be connected to acces this</p>";
         } 
-        if(gettype($_SESSION["groupID"]) == "integer" ){
-            echo "
-            <form method='POST' action=''>
-                <input type='submit' value='Leave group' name='leave'>
-            </form>
-            ";
-            leaveGroup() ;
-        } else {
+        else if (!$_SESSION["groupID"]){
             echo"<p>You have to be in a group to acces to this Page</p><br>";
         }
     ?>
