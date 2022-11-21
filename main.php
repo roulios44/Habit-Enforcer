@@ -18,7 +18,7 @@ class mainPage extends Request{
                 header('Location: search.php');
             }
     }
-    public function rankUser(){
+    public function rankGroup(){
         $con = $this->openDB();
         $query = "SELECT `name` FROM `group` ORDER BY score";
         $result = mysqli_query($con, $query);
@@ -134,7 +134,7 @@ class mainPage extends Request{
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn"><h1>Ranking</h1>
             <?php
-                $main->rankUser();
+                $main->rankGroup();
             ?>
             </div>
             <div id="habits" name="habits" class="habits" class="aColumn"><h1>Habits</h1>

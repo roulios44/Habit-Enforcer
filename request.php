@@ -111,7 +111,7 @@ abstract class Request{
         mysqli_close($db) ;
         $this->addUserGroup($groupID, $ownerID) ;
         $this->deleteTask("userID", $ownerID);
-        $this->resetScore($ownerID);
+        $this->updateInDB("user","score",0,"id",$ownerID);
         return $groupID;
     }
     
@@ -294,9 +294,7 @@ abstract class Request{
         while ($row = mysqli_fetch_assoc($result)) {
             $groupScore+=$row['score'];
         }
-        $sql2 = $con->prepare("UPDATE `group` SET score = ? WHERE id = ?");
-        $sql2->bind_param("ss", $groupScore, $groupID);
-        $sql2->execute();
+        $this->updateInDB("group","score",$groupScore,"id",$groupID);
     }
 
     protected function deleteAccount(int $userID,int $groupID) {
@@ -305,9 +303,13 @@ abstract class Request{
             if($groupOwnerID == $userID)$this->destroyGroup($groupID) ;
             else $this->updateGroupMembers($groupID,$userID) ;
         }
+        $this->delete("user","id",$userID) ;
+    }
+
+    protected function delete(string $table, string $rowToSearch,string $condition){
         $db = $this->openDB();
-        $stmt = $db->prepare("DELETE FROM user WHERE id = ?");
-        $stmt->execute([$userID]);
+        $stmt = $db->prepare("DELETE FROM $table WHERE $rowToSearch = ?");
+        $stmt->execute([$condition]);
         mysqli_close($db) ;
     }
 }
