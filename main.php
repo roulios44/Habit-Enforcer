@@ -22,7 +22,7 @@ class mainPage extends Request{
         $query = "SELECT `name` FROM `group` ORDER BY score";
         $result = mysqli_query($con, $query);
         while ($row = mysqli_fetch_assoc($result)) {
-            echo "<div>".$row['name']."</div>";
+            echo "<div><p>".$row['name']."</p></div>";
         }
     }
 
@@ -33,7 +33,7 @@ class mainPage extends Request{
         if ($nbDaysBetween >=1) {
             $this->createHabit();
         } else {
-            echo "<div>Already added an habit</div>";  
+            echo "<div><p>Already added an habit</p></div>";  
         }
     }
 
@@ -107,13 +107,13 @@ class mainPage extends Request{
                     $score['score'] = abs($score['score']);
                 }
                 if ($row['username'] == $_SESSION['username']) {
-                    echo "<div> You ".$lost." ".$score['score']." point(s) since last connection</div>";
+                    echo "<div><p> You ".$lost." ".$score['score']." point(s) since last connection</p></div>";
                 } else {
-                    echo "<div>".$row['username']." ".$lost." ".$score['score']." point(s) since last connection</div>";
+                    echo "<div><p>".$row['username']." ".$lost." ".$score['score']." point(s) since last connection</p></div>";
                 }
             }
         } else {
-                echo "<div id=totalScore> Total score =".$this->getInDB("score","user","id" ,$_SESSION["id"])["score"]." </div>";
+                echo "<div id=totalScore><p> Total score =".$this->getInDB("score","user","id" ,$_SESSION["id"])["score"]."</p> </div>";
                 echo "<form method=POST id=viewInvite><input type=submit name=viewInvite value=invitations></form>";
                 echo "<form method=POST id=createGroup><input type=submit name=createGroup value=Create&nbsp;group></form>";
         }

@@ -127,6 +127,7 @@ abstract class Request{
             $score = $this->defineScoreUpdate($done, $row['difficulty'],"instantManaging");
             $currentScore = $this->getInDB("score", "user","id",$row['userID'])["score"] ;
             $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
+            $this->addNewScore($row['userID']);
         }
         mysqli_close($con) ;
     }
@@ -227,7 +228,7 @@ abstract class Request{
         $db = $this->openDB();
         $score = $this->getInDB("score", "user","id", $id);
         $date = date("Y-m-d H:i:s");
-        $stmt = $db->prepare("UPDATE score SET score = ? WHERE userID = ? AND `date` = ?");
+        $stmt = $db->prepare("INSERT INTO score (score,userID,`date`) VALUES (?,?,?)");
         $stmt->bind_param("sss",$score['score'], $id, $date);
         $stmt->execute();
     }
