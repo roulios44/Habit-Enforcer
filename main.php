@@ -131,19 +131,19 @@ class mainPage extends Request{
         $main->checkIfGroup();
     ?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
-        <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking
+        <div id="ranking" name="ranking" class="ranking" class="aColumn"><h1>Ranking</h1>
             <?php
                 $main->rankUser();
             ?>
             </div>
-            <div id="habits" name="habits" class="habits" class="aColumn">Habits
+            <div id="habits" name="habits" class="habits" class="aColumn"><h1>Habits</h1>
                 <button id="openModal">Create habit</button>
                 <div id="modal" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
                         <form method="POST">
-                            Description :<input type="text" id="description" name="description">
-                            <div class="star-widget">Difficulty :
+                            <p>Description :</p><input type="text" id="description" name="description">
+                            <div class="star-widget"><p>Difficulty :</p>
                                 <input type="radio" name="difficulty" id="difficulty-5" value="5">
                                 <label for="difficulty-5" class="fas fa-star"></label>
                                 <input type="radio" name="difficulty" id="difficulty-4" value="4">
@@ -155,8 +155,8 @@ class mainPage extends Request{
                                 <input type="radio" name="difficulty" id="difficulty-1" value="1">
                                 <label for="difficulty-1" class="fas fa-star"></label>
                             </div>
-                            Color :<input type="color" name="color" value="#333333" list="colors">
-                            Period of time : <select name="time" id="time">
+                            <p>Color :</p><input type="color" name="color" value="#333333" list="colors">
+                            <p>Period of time :</p> <select name="time" id="time">
                                 <option value="daily">Daily</option>
                                 <option value="weekly">Weekly</option>
                             </select>
@@ -174,12 +174,12 @@ class mainPage extends Request{
                 $main->generateHabit();
             ?>
         </div>
-        <div id="toDo" name="toDo" class="toDo" class="aColumn">To Do
+        <div id="toDo" name="toDo" class="toDo" class="aColumn"><h1>TODO</h1>
         <?php
                 $main->habitToDo();
             ?>
         </div>
-        <div id="group" name="group" class="group" class="aColumn">Group
+        <div id="group" name="group" class="group" class="aColumn"><h1>Group</h1>
             <?php 
                 $main->groupInfo();
             ?>

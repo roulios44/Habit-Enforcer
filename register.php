@@ -8,6 +8,7 @@ class Register extends Request {
         } else {
             echo "
             <div class='form'>
+            <h1>Register</h1>
             <form action='register.php' method='POST'>
                 <input type='text' name='username' placeholder='username'>
                 <input type='text' name = 'password' placeholder='password'>
@@ -16,7 +17,6 @@ class Register extends Request {
                 <input type='submit' name='submit' value='Create your profile !'></input></p>
                 </div>
             </form>
-            <?php beginRegister() ;?>
         </div>
             " ;
             $this->beginRegister();
@@ -59,7 +59,6 @@ class Register extends Request {
 <html lang="en">
 <?php include "head.php" ;?>
 <body>
-    <?php include "header.php"?>
     <?php 
     $register = new Register;
     $register->generatePage() ;
