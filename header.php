@@ -26,16 +26,13 @@ $header = new Header ;
 ?>
 <div class="header">
     <div class="leftHeader">
-        <p>left Header</p>
         <div>
         <form action="main.php">
             <input type="submit" value="HOME">
         </form>
         </div>
     </div>
-    <div class="rightHeader">
-        <p>right Header</p>
-        
+    <div class="rightHeader">        
         <?php $header->generateHeader() ;?>
     </div>
     <?php 

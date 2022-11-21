@@ -75,7 +75,7 @@ class mainPage extends Request{
         $query = "SELECT description FROM habit WHERE isDone = False and userID = $_SESSION[id]";
         $result = mysqli_query($con, $query);
         while ($row = mysqli_fetch_assoc($result)) {
-            echo "<div>".$row['description']."</div>";
+            echo "<div><p>".$row['description']."</p></div>";
         }
     }
 
@@ -85,7 +85,7 @@ class mainPage extends Request{
         // if the user is in a group
         if ($userInfo['groupID'] != null) {
             $this->updateGroupScore($userInfo['groupID']);
-            echo "<div id=totalScore> Total score =".$this->getInDB("score","group","id" ,$userInfo['groupID'])["score"]." </div>";
+            echo "<div id=totalScore><p> Total score =".$this->getInDB("score","group","id" ,$userInfo['groupID'])["score"]."</p> </div>";
             echo "<form method=POST id=invite><input type=submit name=invite value=invite people></form>";
             $stmt = $con->prepare("SELECT username, id, lastConnection FROM user WHERE groupID = ?");
             $stmt->bind_param("s",$userInfo['groupID']);
