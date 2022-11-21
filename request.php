@@ -272,7 +272,7 @@ abstract class Request{
 
     protected function getRankings() {
         $con = $this->openDB();
-        $query = "SELECT `name` FROM `group` ORDER BY score";
+        $query = "SELECT `name` FROM `group` ORDER BY score DESC LIMIT 5";
         $result = mysqli_query($con, $query);
         while ($row = mysqli_fetch_assoc($result)) {
             echo "<div>".$row['name']."</div>";
