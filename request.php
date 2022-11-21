@@ -1,3 +1,5 @@
+296 lines (276 sloc)  11.9 KB
+
 <?php
 abstract class Request{
     protected function openDB() {

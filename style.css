@@ -185,3 +185,10 @@
     background-color: red;
     }
 
+#openModal{
+	font-size: 20px;
+	background-color: #eda630;
+	border-radius: 3px;
+	box-shadow: black;
+	
+}

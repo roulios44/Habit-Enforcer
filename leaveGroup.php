@@ -1,47 +1,59 @@
-<?php require "request.php";
-session_start();
+<?php 
+require_once "request.php" ;
+session_start() ;
+class Header extends Request{
 
-class leaveGroup extends Request{
-    public function leaveGroup(){
-        if($_POST["leave"]){
-            echo $_SESSION["id"];
-            $this->updateInDB("user","groupID",NULL,"id",$_SESSION["id"]);
-            $this->removeGroupMembers() ;
+    public function generateHeader(){
+        if (session_status() === PHP_SESSION_ACTIVE){
+            echo "<div id=manageAccount>";
+            echo "<form method=POST id=deconnexionForm><input type=submit name=deconnect value=Deconnexion></form>";
+            echo "<form method=POST id=deleteAccount><input type=submit name=deleteAccount value=Delete&nbsp;account></form>";
+            echo "</div>";
+        }
+        if (isset($_POST["deconnect"]) || isset($_POST["deleteAccount"])) {
+            if (isset($_POST["deleteAccount"])) {
+                $this->deleteAccount($_SESSION['id']);
+                $this->deleteTask("userID",$_SESSION['id']);
+            }
+            $this->refreshLastConnection($_SESSION['id']);
+            session_unset();
+            session_destroy();
+            header('Location: signIn.php');
         }
     }
-    private function removeGroupMembers(){
-        $members = json_decode($this->getInDB("members","group","id",$_SESSION["groupID"])["members"]) ;
-        if (($key = array_search($_SESSION["id"], $members)) !== false) {
-            unset($members[$key]);
+}
+$header = new Header ;
+?>
+<div class="header">
+    <div class="leftHeader">
+        <p>left Header</p>
+        <div>
+        <form action="main.php">
+            <input type="submit" value="HOME">
+        </form>
+        </div>
+    </div>
+    <div class="rightHeader">
+        <p>right Header</p>
+        
+        <?php $header->generateHeader() ;?>
+    </div>
+    <?php 
+        
+    ?>
+</div>
+
+<?php
+function disconnect(){
+    if ($_SESSION["id"]){
+        if (session_status() === PHP_SESSION_ACTIVE){
+            echo "<form method=POST id=deconnexionForm><input type=submit name=deconnect value=deconnexion></form>";
         }
-        $this->updateInDB("group","members",json_encode($members), "id",$_SESSION["groupID"]);
+        if (isset($_POST["deconnect"])) {
+            session_unset();
+            session_destroy();
+            header('Location: signIn.php');
+        }
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-    <?php
-    include "head.php"
-    ?>
-    <body>
-        <?php include "header.php" ?>
-        <?php
-        if(!gettype($_SESSION["id"])){
-            echo "<p>You have to be connected to acces this</p>" ;
-        }
-        if(gettype($_SESSION["groupID"]) == "integer" ){
-            echo "
-            <form method='POST' action=''>
-                <input type='submit' value='Leave group' name='leave'>
-            </form>
-            ";
-            $leaveGroup = new leaveGroup ;
-            $leaveGroup->leaveGroup() ;
-        } else {
-            echo"<p>You have to be in a group to acces to this Page</p><br>";
-        }
-        ?>
-    </body>
-    <?php include "footer.php" ;?>
-</html>
