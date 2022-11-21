@@ -42,12 +42,10 @@ class mainPage extends Request{
         $con = $this->openDB();
         $query = "SELECT description, id, color FROM habit WHERE userID = $_SESSION[id] ORDER BY color";
         $result = mysqli_query($con, $query);
-        $nbRows = mysqli_num_rows($result);
-        $IDArray = [];
         echo "<form id=sendDone method=post>";
         echo "<div id=allHabits>";
         while ($row = mysqli_fetch_assoc($result)) {
-            array_push($IDArray, $row['id']);
+            $this->habitExpire();
             if (isset($_POST['changeHabit'])) {
                 $isDone = (isset($_POST["isDone_".$row['id']]) ? '1' : '0');
                 $this->completeTask($isDone,$row['id']);
@@ -63,9 +61,6 @@ class mainPage extends Request{
                 $sayDone = "Undone";
             }
             echo "<div class=habitStyle style=background-color:".$row['color']."> <input type=checkbox name=isDone_".$row['id']." id=isDone_".$row['id']." value=done ".$check.">".$row['description']." <input type=submit name=removeHabit".$row['id']." value=x> </div>";
-        }
-        if(sizeof($IDArray)>0){
-            echo "<input type=submit name=changeHabit>";
         }
         echo "</div>";
         echo "</form>";
@@ -86,7 +81,11 @@ class mainPage extends Request{
         // if the user is in a group
         if ($userInfo['groupID'] != null) {
             $this->updateGroupScore($userInfo['groupID']);
-            echo "<div id=totalScore><p> Total score =".$this->getInDB("score","group","id" ,$userInfo['groupID'])["score"]."</p> </div>";
+            $totalGroupScore = $this->getInDB("score","group","id" ,$userInfo['groupID'])['score'];
+            if ($totalGroupScore <0) {
+                $this->destroyGroup($userInfo['groupID']);
+            }
+            echo "<div id=totalScore> Total score =".$totalGroupScore." </div>";
             echo "<form method=POST id=invite><input type=submit name=invite value=invite people></form>";
             $stmt = $con->prepare("SELECT username, id, lastConnection FROM user WHERE groupID = ?");
             $stmt->bind_param("s",$userInfo['groupID']);
@@ -163,14 +162,11 @@ class mainPage extends Request{
                             </select>
                             <input type="submit" id="submit" value = "Add habit">
                         </form>
-                        <?php 
+                </div>
+                <?php 
                     $main->startCreateHabit();
                     ?>
-                </div>
             </div>
-            <?php
-
-            ?>
             <?php
                 $main->generateHabit();
             ?>

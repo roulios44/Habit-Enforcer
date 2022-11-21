@@ -25,7 +25,7 @@ abstract class Request{
     
     protected function refreshLastConnection(int $userID) {
         $con = $this->openDB();
-        $currentDate = date("Y-m-d H:i:s");
+        $currentDate = date("Ymdhi");
         $stmt = $con->prepare("UPDATE user SET lastConnection = ? WHERE id = ?");
         $stmt->bind_param("ss", $currentDate, $userID);
         $stmt->execute();
@@ -38,14 +38,13 @@ abstract class Request{
             $description = strip_tags($_POST["description"]);
             $difficulty =strip_tags($_POST["difficulty"]);
             $color = strip_tags($_POST["color"]);
-            $start = date("Y-m-d H:i:s");
+            $start = date("Y-m-d");
             $time = strip_tags($_POST["time"]);
             $userID = $_SESSION["id"];
             $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
             $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
             $stmt->execute();
             $this->updateInDB("user","lastAddHabit",date('Y-m-d'),"id",$userID);
-            $this->updateInDB("user","lastAddHabit",date("Y-m-d"),"id",$userID) ;
         }else {
             echo "Please fill all the required fields to add an habit";
         }
@@ -127,6 +126,7 @@ abstract class Request{
             $score = $this->defineScoreUpdate($done, $row['difficulty'],"instantManaging");
             $currentScore = $this->getInDB("score", "user","id",$row['userID'])["score"] ;
             $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
+            echo $row["userID"] ;
             $this->addNewScore($row['userID']);
         }
         mysqli_close($con) ;
@@ -174,13 +174,13 @@ abstract class Request{
         $this->deleteTask("userID", $userID);
 
     }
-    protected function addNewScore($id) {
+    protected function addNewScore(int $userID) {
         $db = $this->openDB();
-        $score = $this->getInDB("score", "user","id", $id);
+        $score = $this->getInDB("score", "user","id", $userID)["score"];
         $date = date("Ymdhi");
+        print_r($userID) ;
         $stmt = $db->prepare("INSERT INTO score (score, userID, `date`) VALUES (?,?,?)");
-        $stmt->bind_param("sss",$score['score'], $id, $date);
-        $stmt->execute();
+        $stmt->execute([$score,$userID,$date]);
     }
     
     protected function updateGroupMembers(int $groupID, int $userID){
@@ -223,14 +223,13 @@ abstract class Request{
         }
     }
 
-    protected function habitExpire(int $id) {
+    protected function habitExpire() {
         $db = $this->openDB();
         $date = date("Y-m-d");
         $stmt = $db->prepare("SELECT `start`, `time`, isDone, difficulty, userID FROM habit");
         $stmt->execute();
         $resultQuery = $stmt->get_result();
         $row = $resultQuery->fetch_assoc();
-        $date = date("Y-m-d");
         $habitDate = $row['start'];
         $nbDaysBetween = (strtotime($date)-strtotime($habitDate))/86400;
         if (($row['time']=="daily" && $nbDaysBetween >= 1) ||($row['time']=="weekly" && $nbDaysBetween >= 7)) {
@@ -260,8 +259,11 @@ abstract class Request{
     
     protected function destroyGroup(int $groupID){
         $members = json_decode($this->getInDB("members", "group","id", $groupID)["members"]) ;
+        echo $members;
         foreach($members as $memberID){
             $this->updateInDB("user","groupID",NULL,"id",$memberID);
+            $this->deleteTask("userID",$memberID);
+            $this->resetScore($memberID);
         }
         $db = $this->openDB();
         $sql = $db->prepare("DELETE FROM `group` WHERE id = ?");
@@ -303,6 +305,7 @@ abstract class Request{
             if($groupOwnerID == $userID)$this->destroyGroup($groupID) ;
             else $this->updateGroupMembers($groupID,$userID) ;
         }
+        $this->deleteTask("userID", $userID) ;
         $this->delete("user","id",$userID) ;
     }
 
