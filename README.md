@@ -25,4 +25,4 @@ Then start you're application with the control pannel jump into it !
 When you'll be connected you'll be able to create a group and ivnite friends into it and begin to do your Habit with challenge ! <br>
 Enjoy
 
-Enjoy our game ;)
+Enjoy our Site ;)
