@@ -24,6 +24,7 @@ $header = new Header ;
 ?>
 <div class="header">
     <div class="leftHeader">
+        <p>Bonjour    <?php echo $_SESSION["username"] ?> </p>
         <div>
         <form action="main.php">
             <input type="submit" value="HOME">
