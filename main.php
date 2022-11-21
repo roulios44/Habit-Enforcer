@@ -17,7 +17,8 @@ class mainPage extends Request{
                 header('Location: search.php');
             }
     }
-    public function rankUser(){
+    public function rankGroup(){
+        echo "<p>Top 5 Groups</p>";
         $con = $this->openDB();
         $query = "SELECT `name` FROM `group` ORDER BY score";
         $result = mysqli_query($con, $query);
