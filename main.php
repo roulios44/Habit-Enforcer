@@ -1,7 +1,6 @@
-
 <?php 
-session_start(); ?>
-<?php require_once "request.php" ?>
+session_start();
+require_once "request.php" ;?>
 <?php 
 class mainPage extends Request{
 
@@ -86,7 +85,7 @@ class mainPage extends Request{
         // if the user is in a group
         if ($userInfo['groupID'] != null) {
             $this->updateGroupScore($userInfo['groupID']);
-            echo "<div id=totalScore> Total score =".$this->getInDB("score","group","id" ,$userInfo['groupID'])["score"]." </div>";
+            echo "<div id=totalScore> Total score = ".$this->getInDB("score","group","id" ,$userInfo['groupID'])["score"]." </div>";
             echo "<form method=POST id=invite><input type=submit name=invite value=invite people></form>";
             $stmt = $con->prepare("SELECT username, id, lastConnection FROM user WHERE groupID = ?");
             $stmt->bind_param("s",$userInfo['groupID']);

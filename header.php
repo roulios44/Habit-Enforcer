@@ -1,6 +1,5 @@
 <?php 
 require_once "request.php" ;
-session_start() ;
 class Header extends Request{
 
     public function generateHeader(){
