@@ -14,7 +14,6 @@ class Header extends Request{
                 $this->deleteAccount($_SESSION['id'],$_SESSION["groupID"]);
                 $this->deleteTask("userID",$_SESSION['id']);
             }
-            $this->refreshLastConnection($_SESSION['id']);
             session_unset();
             session_destroy();
             header('Location: signIn.php');

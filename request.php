@@ -15,7 +15,7 @@ abstract class Request{
     
     protected function addUserDB(String $username, String $email, String $pwd) {
         $hashPassword = password_hash($pwd,PASSWORD_DEFAULT);
-        $currentDate = date("Y-m-d");
+        $currentDate = date("Ymdhi");
         $con = $this->openDB();
         $stmt = $con->prepare("INSERT INTO user (username, email, password,lastConnection) VALUES (?,?,?,?)");
         $stmt->bind_param("ssss", $username, $email, $hashPassword, $currentDate);
@@ -126,8 +126,8 @@ abstract class Request{
             $score = $this->defineScoreUpdate($done, $row['difficulty'],"instantManaging");
             $currentScore = $this->getInDB("score", "user","id",$row['userID'])["score"] ;
             $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
-            echo $row["userID"] ;
             $this->addNewScore($row['userID']);
+            $this->refreshLastConnection($row["userID"]) ;
         }
         mysqli_close($con) ;
     }
@@ -178,7 +178,6 @@ abstract class Request{
         $db = $this->openDB();
         $score = $this->getInDB("score", "user","id", $userID)["score"];
         $date = date("Ymdhi");
-        print_r($userID) ;
         $stmt = $db->prepare("INSERT INTO score (score, userID, `date`) VALUES (?,?,?)");
         $stmt->execute([$score,$userID,$date]);
     }
@@ -238,6 +237,7 @@ abstract class Request{
                 $currentScore = $this->getInDB("score","user","id",$row["userID"])["score"] ;
                 $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
                 $this->addNewScore($row['userID']);
+                $this->refreshLastConnection($row["userID"]) ;
             }
         }
     }
@@ -259,7 +259,6 @@ abstract class Request{
     
     protected function destroyGroup(int $groupID){
         $members = json_decode($this->getInDB("members", "group","id", $groupID)["members"]) ;
-        echo $members;
         foreach($members as $memberID){
             $this->updateInDB("user","groupID",NULL,"id",$memberID);
             $this->deleteTask("userID",$memberID);
@@ -287,7 +286,7 @@ abstract class Request{
         $stmt->execute();
     }
 
-    protected function updateGroupScore($groupID) {
+    protected function updateGroupScore(int $groupID) {
         $groupScore = 0;
         $con = $this->openDB();
         $sql = $con->prepare("SELECT `score` FROM user WHERE groupID = $groupID");

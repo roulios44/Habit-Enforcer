@@ -6,7 +6,6 @@ class mainPage extends Request{
 
     public function checkIfConnected(){
         if(is_null($_SESSION["id"]))header('Location: signIn.php') ;
-        $this->refreshLastConnection($_SESSION["id"]);
     }
 
     public function userNavigation(){
@@ -42,6 +41,7 @@ class mainPage extends Request{
         $con = $this->openDB();
         $query = "SELECT description, id, color FROM habit WHERE userID = $_SESSION[id] ORDER BY color";
         $result = mysqli_query($con, $query);
+        $nbRows = mysqli_num_rows($result);
         echo "<form id=sendDone method=post>";
         echo "<div id=allHabits>";
         while ($row = mysqli_fetch_assoc($result)) {
@@ -62,6 +62,7 @@ class mainPage extends Request{
             }
             echo "<div class=habitStyle style=background-color:".$row['color']."> <input type=checkbox name=isDone_".$row['id']." id=isDone_".$row['id']." value=done ".$check.">".$row['description']." <input type=submit name=removeHabit".$row['id']." value=x> </div>";
         }
+        echo "<input type=submit name=changeHabit>";
         echo "</div>";
         echo "</form>";
     }
@@ -78,14 +79,9 @@ class mainPage extends Request{
     public function groupInfo(){
         $con = $this->openDB();
         $userInfo = $this->getInDB("groupID, lastConnection","user","id",$_SESSION["id"]);
-        // if the user is in a group
         if ($userInfo['groupID'] != null) {
             $this->updateGroupScore($userInfo['groupID']);
-            $totalGroupScore = $this->getInDB("score","group","id" ,$userInfo['groupID'])['score'];
-            if ($totalGroupScore <0) {
-                $this->destroyGroup($userInfo['groupID']);
-            }
-            echo "<div id=totalScore> Total score =".$totalGroupScore." </div>";
+            echo "<div id=totalScore> Total score =".$this->getInDB("score","group","id" ,$userInfo['groupID'])['score']." </div>";
             echo "<form method=POST id=invite><input type=submit name=invite value=invite people></form>";
             $stmt = $con->prepare("SELECT username, id, lastConnection FROM user WHERE groupID = ?");
             $stmt->bind_param("s",$userInfo['groupID']);
@@ -107,13 +103,13 @@ class mainPage extends Request{
                     $score['score'] = abs($score['score']);
                 }
                 if ($row['username'] == $_SESSION['username']) {
-                    echo "<div><p> You ".$lost." ".$score['score']." point(s) since last connection</p></div>";
+                    echo "<div> You ".$lost." ".$score['score']." point(s) since last connection</div>";
                 } else {
-                    echo "<div><p>".$row['username']." ".$lost." ".$score['score']." point(s) since last connection</p></div>";
+                    echo "<div>".$row['username']." ".$lost." ".$score['score']." point(s) since last connection</div>";
                 }
             }
         } else {
-                echo "<div id=totalScore><p> Total score =".$this->getInDB("score","user","id" ,$_SESSION["id"])["score"]."</p> </div>";
+                echo "<div id=totalScore> Total score =".$this->getInDB("score","user","id" ,$_SESSION["id"])["score"]." </div>";
                 echo "<form method=POST id=viewInvite><input type=submit name=viewInvite value=invitations></form>";
                 echo "<form method=POST id=createGroup><input type=submit name=createGroup value=Create&nbsp;group></form>";
         }
