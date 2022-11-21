@@ -16,6 +16,7 @@ class groupCreate extends Request{
         } else {
             $idGroup = $this->dbGroupCreate($groupName,$_SESSION["id"]);
             $_SESSION["groupID"] = $idGroup ;
+            header('Location: main.php') ;
         }
     }
     
