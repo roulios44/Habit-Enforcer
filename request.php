@@ -24,7 +24,7 @@ function addUserDB(String $username, String $email, String $pwd) {
 
 function refreshLastConnection(int $userID) {
     $con = openDB();
-    $currentDate = date("Y-m-d");
+    $currentDate = date("Y-m-d H:i:s");
     $stmt = $con->prepare("UPDATE user SET lastConnection = ? WHERE id = ?");
     $stmt->bind_param("ss", $currentDate, $userID);
     $stmt->execute();
@@ -112,7 +112,15 @@ function dbGroupCreate(String $groupName, int $ownerID){
     $sql->execute();
     $groupID = $db->insert_id;
     mysqli_close($db) ;
-    addUserGroup($groupID, $ownerID) ;
+    addUserGroup($groupID, $ownerID);
+    deleteTask("userID", $ownerID);
+    resetScore($ownerID);
+}
+
+function resetScore($id) {
+    $con = openDB();
+    $stmt = $con->prepare("UPDATE user SET score = 0 WHERE id = $id");
+    $stmt->execute();
 }
 
 function completeTask(int $done, int $id) {
@@ -167,7 +175,9 @@ function addUserGroup(int $groupID, int $userID){
     $stmt->bind_param("ii", $groupID, $userID);
     $stmt->execute();
     mysqli_close($con) ;
-    updateGroupMembers($groupID,$userID) ;
+    updateGroupMembers($groupID,$userID);
+    deleteTask("userID", $userID);
+    resetScore($userID);
 }
 
 function updateGroupMembers(int $groupID, int $userID){
@@ -250,17 +260,10 @@ function habitExpire() {
 function addNewScore($id) {
     $db = openDB();
     $score = getInDB("score", "user","id", $id);
-    $date = date("Y-m-d");
-    $result = getInDB("score", "score", "userID = $id AND `date`", $date);
-    if ($result == null) {
-        $stmt = $db->prepare("INSERT INTO `score` (score, userID) VALUES (?,?)");
-        $stmt->bind_param("ss",$score['score'], $id);
-        $stmt->execute();
-    } else {
-        $stmt = $db->prepare("UPDATE score SET score = ? WHERE userID = ? AND `date` = ?");
-        $stmt->bind_param("sss",$score['score'], $id, $date);
-        $stmt->execute();
-    }
+    $date = date("Y-m-d H:i:s");
+    $stmt = $db->prepare("UPDATE score SET score = ? WHERE userID = ? AND `date` = ?");
+    $stmt->bind_param("sss",$score['score'], $id, $date);
+    $stmt->execute();
 }
 
 function resetTime($date) {
@@ -270,9 +273,9 @@ function resetTime($date) {
     $stmt->execute();
 }
 
-function deleteTask($id) {
+function deleteTask($condition, $id) {
     $db = openDB();
-    $stmt = $db->prepare("DELETE FROM habit WHERE id = ?");
+    $stmt = $db->prepare("DELETE FROM habit WHERE $condition = ?");
     $stmt->bind_param("s", $id);
     $stmt->execute();
 }

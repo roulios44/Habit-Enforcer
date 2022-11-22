@@ -13,11 +13,11 @@
             echo "</div>";
         }
         if (isset($_POST["deconnect"]) || isset($_POST["deleteAccount"])) {
+            include "request.php";
             if (isset($_POST["deleteAccount"])) {
-                require_once "request.php";
                 deleteAccount($_SESSION['id']);
+                deleteTask("userID",$_SESSION['id']);
             }
-            require "request.php";
             refreshLastConnection($_SESSION['id']);
             session_unset();
             session_destroy();

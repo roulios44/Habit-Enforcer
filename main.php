@@ -82,7 +82,7 @@
                         $isDone = (isset($_POST["isDone_".$row['id']]) ? '1' : '0');
                         completeTask($isDone,$row['id']);
                     } else if (isset($_POST["removeHabit".$row['id']])) {
-                        deleteTask($row['id']);
+                        deleteTask("id", $row['id']);
                         continue;
                     }
                     $done = checkIfDone($row['id']);
@@ -122,6 +122,7 @@
                     $stmt->execute();
                     $result = $stmt->get_result();
                     while ($row = mysqli_fetch_assoc($result)) {
+                        $date = date("Y-m-d H:i:s");
                         $previousScore = getInDB("score", "score", "userID = $row[id] AND `date`", $userInfo['lastConnection']);
                         $score = getInDB("score", "score", "userID = $row[id] AND `date`", $date);
                         if ($previousScore == null) {
