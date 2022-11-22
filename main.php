@@ -16,14 +16,7 @@
     ?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
         <div id="ranking" name="ranking" class="ranking" class="aColumn">Ranking
-            <?php
-                $con = openDB();
-                $query = "SELECT `name` FROM `group` ORDER BY score";
-                $result = mysqli_query($con, $query);
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<div>".$row['name']."</div>";
-                }
-            ?>
+            <?php getRankings();?>
             </div>
         <div id="habits" name="habits" class="habits" class="aColumn">Habits
             <button id="openModal">Create habit</button>
@@ -51,24 +44,22 @@
                     </select>
                     <input type="submit" id="submit" value = "Add habit">
                     </form>
-                    <?php 
-                    $date = date("Y-m-d");
-                    $stmt = $con->prepare("SELECT lastAddHabit FROM user WHERE id = $_SESSION[id]");
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    $nbDaysBetween = (strtotime($date)-strtotime(mysqli_fetch_assoc($result)['lastAddHabit']))/86400;
-                    if ($nbDaysBetween >1) {
-                        createHabit();
-                    } else {
-                        echo "<div>Already added an habit</div>";
+                    <?php addHabit();
+                    function addHabit() {
+                        $date = date("Y-m-d");
+                        $stmt = $con->prepare("SELECT lastAddHabit FROM user WHERE id = $_SESSION[id]");
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        $nbDaysBetween = (strtotime($date)-strtotime(mysqli_fetch_assoc($result)['lastAddHabit']))/86400;
+                        if ($nbDaysBetween >1) {
+                            createHabit();
+                        } else {
+                            echo "Already added an habit";
+                        }
                     }?>
                 </div>
             </div>
             <?php
-
-            ?>
-            <?php
-                habitExpire();
                 $con = openDB();
                 $query = "SELECT description, id, color FROM habit WHERE userID = $_SESSION[id] ORDER BY color";
                 $result = mysqli_query($con, $query);
