@@ -5,7 +5,8 @@ class Search extends Request{
     public function beginSearch(){
         if(!empty($_POST["search"]))$this->inviteUser($_POST["search"]);
         if(!empty($_POST['searchUser'])){
-            $this->search(strip_tags($_POST['searchUser']));
+            $searchValue =strip_tags($_POST['searchUser']) ;
+            $this->search($searchValue);
         }
     }
     private function search(String $searchValue){

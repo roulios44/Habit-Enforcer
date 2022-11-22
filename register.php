@@ -17,6 +17,7 @@ class Register extends Request {
                 <input type='submit' name='submit' value='Create your profile !'></input></p>
                 </div>
             </form>
+            <p>Already have an account <a href='http://localhost/Habit-Enforcer/signIn.php'>Login here</a></p><br>
         </div>
             " ;
             $this->beginRegister();

@@ -6,20 +6,21 @@ class Login extends Request{
         else $this->SignIn(strip_tags($_POST["username"]), strip_tags($_POST["password"]));
     }
 
-    public function SignIn(String $username, String $password){
-        if (!$this->alreadyExist($username,"user", "username"))echo "This username is unknow of our website, you can create a account with this one";
-        else {
-            if ($this->checkPassword($username,$password)){
-                session_start();
-                $_SESSION["username"] = strip_tags($username) ;
-                $_SESSION["id"] = $this->getInDB("id","user","username",strip_tags($username))["id"];
-                $_SESSION["groupID"] = $this->getInDB("groupID","user","id",$_SESSION["id"])["groupID"] ;
-                header('Location: main.php');
-            } else {
-                echo "<p>Wrong password, try again</p>" ;
-            }
+function SignIn(String $username, String $password){
+    if (!$this->alreadyExist($username,"user", "username"))echo "This username is unknow of our website, you can create a account with this one";
+    else {
+        if ($this->checkPassword($username,$password)){
+            session_start();
+            $_SESSION["username"] = strip_tags($username) ;
+            $_SESSION["id"] = $this->getInDB("id","user","username",strip_tags($username))["id"];
+            $_SESSION["groupID"] = $this->getInDB("groupID","user","id",$_SESSION["id"])["groupID"];
+            $this->habitExpire();
+            header('Location: main.php');
+        } else {
+            echo "<p>Wrong password, try again</p>" ;
         }
     }
+}
 
     public function generatePage(){
         if (!isset($_SESSION["id"])){

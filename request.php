@@ -25,7 +25,7 @@ abstract class Request{
     
     protected function refreshLastConnection(int $userID) {
         $con = $this->openDB();
-        $currentDate = date("Ymdhi");
+        $currentDate = date("Ymdh");
         $stmt = $con->prepare("UPDATE user SET lastConnection = ? WHERE id = ?");
         $stmt->bind_param("ss", $currentDate, $userID);
         $stmt->execute();
@@ -126,8 +126,6 @@ abstract class Request{
             $score = $this->defineScoreUpdate($done, $row['difficulty'],"instantManaging");
             $currentScore = $this->getInDB("score", "user","id",$row['userID'])["score"] ;
             $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
-            $this->addNewScore($row['userID']);
-            $this->refreshLastConnection($row["userID"]) ;
         }
         mysqli_close($con) ;
     }
@@ -176,10 +174,10 @@ abstract class Request{
     }
     protected function addNewScore(int $userID) {
         $db = $this->openDB();
-        $score = $this->getInDB("score", "user","id", $userID)["score"];
-        $date = date("Ymdhi");
+        $score = $this->getInDB("score", "user","id", $userID);
+        $date = date("Ymdh");
         $stmt = $db->prepare("INSERT INTO score (score, userID, `date`) VALUES (?,?,?)");
-        $stmt->execute([$score,$userID,$date]);
+        $stmt->execute([$score['score'],$userID,$date]);
     }
     
     protected function updateGroupMembers(int $groupID, int $userID){
@@ -202,7 +200,7 @@ abstract class Request{
         mysqli_close($db);
         return mysqli_fetch_assoc($resultQuery);
     }
-    protected function getInDB(string $toSelect, string $table, string $rowToSearch, string|int $condition){
+    protected function getInDB(string $toSelect, string $table, string $rowToSearch, string|int|null $condition){
         $db = $this->openDB();
         $sql = $db->prepare("SELECT $toSelect FROM `$table` WHERE $rowToSearch = ?");
         $sql->bind_param("s", $condition);
@@ -224,21 +222,23 @@ abstract class Request{
 
     protected function habitExpire() {
         $db = $this->openDB();
-        $date = date("Y-m-d");
         $stmt = $db->prepare("SELECT `start`, `time`, isDone, difficulty, userID FROM habit");
         $stmt->execute();
         $resultQuery = $stmt->get_result();
-        $row = $resultQuery->fetch_assoc();
-        $habitDate = $row['start'];
-        $nbDaysBetween = (strtotime($date)-strtotime($habitDate))/86400;
-        if (($row['time']=="daily" && $nbDaysBetween >= 1) ||($row['time']=="weekly" && $nbDaysBetween >= 7)) {
-            if ($row['isDone'] == 0) {
-                $score = $this->defineScoreUpdate($row['isDone'], $row['difficulty'], "withTimeManaging")*$nbDaysBetween;
-                $currentScore = $this->getInDB("score","user","id",$row["userID"])["score"] ;
-                $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
-                $this->addNewScore($row['userID']);
-                $this->refreshLastConnection($row["userID"]) ;
+        $date = date("Y-m-d");
+        while ($row = mysqli_fetch_assoc($resultQuery)) {
+            $habitDate = $row['start'];
+            $nbDaysBetween = (strtotime($date)-strtotime($habitDate))/86400;
+            if (($row['time']=="daily" && $nbDaysBetween >= 1) ||($row['time']=="weekly" && $nbDaysBetween >= 7)) {
+                if ($row['isDone'] == 0) {
+                    $score = $this->defineScoreUpdate($row['isDone'], $row['difficulty'], "withTimeManaging")*$nbDaysBetween;
+                    $stmt = $db->prepare("UPDATE user SET score = score+? WHERE id = ?");
+                    $stmt->bind_param("ss",$score, $row['userID']);
+                    $stmt->execute();
+                }
+                $this->resetTime($date, $row['userID']);
             }
+            $this->addNewScore($row['userID']);
         }
     }
 
