@@ -48,7 +48,7 @@ class mainPage extends Request{
                 $isDone = (isset($_POST["isDone_".$row['id']]) ? '1' : '0');
                 $this->completeTask($isDone,$row['id']);
             } else if (isset($_POST["removeHabit".$row['id']])) {
-                $this->deleteTask($row['id']);
+                $this->deleteTask("id",$row['id']);
                 continue;
             }
             $done = $this->checkIfDone($row['id']);

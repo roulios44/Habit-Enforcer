@@ -3,7 +3,7 @@ require_once "request.php";
 session_start() ;
 class Register extends Request {
     public function generatePage(){
-        if (session_status() === PHP_SESSION_ACTIVE){
+        if (isset($_SESSION['id'])){
            header('Location: main.php') ;
         } else {
             echo "

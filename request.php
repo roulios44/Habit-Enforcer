@@ -168,6 +168,7 @@ abstract class Request{
         $stmt->execute();
         mysqli_close($con) ;
         $this->updateGroupMembers($groupID,$userID) ;
+        $this->updateInDB("user", "lastAddHabit", "0000-00-00", "id", $userID);
     }
     protected function updateGroupScore($groupID) {
         $groupScore = 0;
