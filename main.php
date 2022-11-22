@@ -28,11 +28,10 @@ class mainPage extends Request{
     }
 
     public function startCreateHabit(){
-        
         $date = date("Y-m-d");
         $lastAddHabit = $this->getInDB("lastAddHabit", "user","id",$_SESSION["id"])["lastAddHabit"];
         $nbDaysBetween = ((strtotime($date)-strtotime($lastAddHabit))/86400) ;
-        if ($nbDaysBetween >1) {
+        if ($nbDaysBetween >=1) {
             $this->createHabit();
         } else {
             echo "<div>Already added an habit</div>";  
@@ -44,11 +43,9 @@ class mainPage extends Request{
         $query = "SELECT description, id, color FROM habit WHERE userID = $_SESSION[id] ORDER BY color";
         $result = mysqli_query($con, $query);
         $nbRows = mysqli_num_rows($result);
-        $IDArray = [];
         echo "<form id=sendDone method=post>";
         echo "<div id=allHabits>";
         while ($row = mysqli_fetch_assoc($result)) {
-            array_push($IDArray, $row['id']);
             $this->habitExpire($row['id']);
             if (isset($_POST['changeHabit'])) {
                 $isDone = (isset($_POST["isDone_".$row['id']]) ? '1' : '0');
@@ -85,7 +82,11 @@ class mainPage extends Request{
         $userInfo = $this->getInDB("groupID, lastConnection","user","id",$_SESSION["id"]);
         if ($userInfo['groupID'] != null) {
             $this->updateGroupScore($userInfo['groupID']);
-            echo "<div id=totalScore> Total score =".$this->getInDB("score","group","id" ,$userInfo['groupID'])['score']." </div>";
+            $totalGroupScore = $this->getInDB("score","group","id" ,$userInfo['groupID'])['score'];
+            if ($totalGroupScore <0) {
+                $this->destroyGroup($userInfo['groupID']);
+            }
+            echo "<div id=totalScore> Total score =".$totalGroupScore." </div>";
             echo "<form method=POST id=invite><input type=submit name=invite value=invite people></form>";
             $stmt = $con->prepare("SELECT username, id, lastConnection FROM user WHERE groupID = ?");
             $stmt->bind_param("s",$userInfo['groupID']);
@@ -162,14 +163,11 @@ class mainPage extends Request{
                             </select>
                             <input type="submit" id="submit" value = "Add habit">
                         </form>
-                        <?php 
+                </div>
+                <?php 
                     $main->startCreateHabit();
                     ?>
-                </div>
             </div>
-            <?php
-
-            ?>
             <?php
                 $main->generateHabit();
             ?>

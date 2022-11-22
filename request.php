@@ -25,7 +25,7 @@ abstract class Request{
     
     protected function refreshLastConnection(int $userID) {
         $con = $this->openDB();
-        $currentDate = date("Y-m-d H:i:s");
+        $currentDate = date("Ymdhi");
         $stmt = $con->prepare("UPDATE user SET lastConnection = ? WHERE id = ?");
         $stmt->bind_param("ss", $currentDate, $userID);
         $stmt->execute();
@@ -38,14 +38,13 @@ abstract class Request{
             $description = strip_tags($_POST["description"]);
             $difficulty =strip_tags($_POST["difficulty"]);
             $color = strip_tags($_POST["color"]);
-            $start = date("Y-m-d H:i:s");
+            $start = date("Y-m-d");
             $time = strip_tags($_POST["time"]);
             $userID = $_SESSION["id"];
             $stmt = $con->prepare("INSERT INTO habit (description, difficulty, color,start, time, userID) VALUES (?,?,?,?,?,?)");
             $stmt->bind_param("ssssss", $description, $difficulty, $color, $start, $time, $userID);
             $stmt->execute();
             $this->updateInDB("user","lastAddHabit",date('Y-m-d'),"id",$userID);
-            $this->updateInDB("user","lastAddHabit",date("Y-m-d"),"id",$userID) ;
         }else {
             echo "Please fill all the required fields to add an habit";
         }
@@ -238,6 +237,7 @@ abstract class Request{
         $date = date("Y-m-d");
         $habitDate = $row['start'];
         $nbDaysBetween = (strtotime($date)-strtotime($habitDate))/86400;
+        echo $nbDaysBetween;
         if (($row['time']=="daily" && $nbDaysBetween >= 1) ||($row['time']=="weekly" && $nbDaysBetween >= 7)) {
             if ($row['isDone'] == 0) {
                 $score = $this->defineScoreUpdate($row['isDone'], $row['difficulty'], "withTimeManaging")*$nbDaysBetween;
@@ -266,8 +266,11 @@ abstract class Request{
     
     protected function destroyGroup(int $groupID){
         $members = json_decode($this->getInDB("members", "group","id", $groupID)["members"]) ;
+        echo $members;
         foreach($members as $memberID){
             $this->updateInDB("user","groupID",NULL,"id",$memberID);
+            $this->deleteTask("userID",$memberID);
+            $this->resetScore($memberID);
         }
         $db = $this->openDB();
         $sql = $db->prepare("DELETE FROM `group` WHERE id = ?");
