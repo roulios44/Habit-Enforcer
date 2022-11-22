@@ -6,7 +6,6 @@ class mainPage extends Request{
 
     public function checkIfConnected(){
         if(is_null($_SESSION["id"]))header('Location: signIn.php') ;
-        $this->refreshLastConnection($_SESSION["id"]);
     }
 
     public function userNavigation(){
@@ -55,11 +54,9 @@ class mainPage extends Request{
                 continue;
             }
             $done = $this->checkIfDone($row['id']);
-            $sayDone = "Done";
             $check = "";
             if ($done) {
                 $check = "checked";
-                $sayDone = "Undone";
             }
             echo "<div class=habitStyle style=background-color:".$row['color']."> <input type=checkbox name=isDone_".$row['id']." id=isDone_".$row['id']." value=done ".$check.">".$row['description']." <input type=submit name=removeHabit".$row['id']." value=x> </div>";
         }
@@ -93,7 +90,7 @@ class mainPage extends Request{
             $stmt->execute();
             $result = $stmt->get_result();
             while ($row = mysqli_fetch_assoc($result)) {
-                $date = date("Ymdhi");
+                $date = date("Ymdh");
                 $previousScore = $this->getInDB("score", "score", "userID = $row[id] AND `date`", $userInfo['lastConnection']);
                 $score = $this->getInDB("score", "score", "userID = $row[id] AND `date`", $date);
                 if ($previousScore == null) {
