@@ -17,6 +17,8 @@
                 require_once "request.php";
                 deleteAccount($_SESSION['id']);
             }
+            require "request.php";
+            refreshLastConnection($_SESSION['id']);
             session_unset();
             session_destroy();
             header('Location: signIn.php');

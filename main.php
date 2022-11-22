@@ -10,6 +10,8 @@
         header('Location: checkInvite.php');
         } else if (isset($_POST["createGroup"])) {
             header('Location: createGroup.php');
+        } else if (isset($_POST["invite"])) {
+            header('Location: search.php');
         }
     ?>
     <div id="allColumns" name="allColumns" class="allColumns"> 
@@ -66,6 +68,7 @@
 
             ?>
             <?php
+                habitExpire();
                 $con = openDB();
                 $query = "SELECT description, id, color FROM habit WHERE userID = $_SESSION[id] ORDER BY color";
                 $result = mysqli_query($con, $query);
@@ -75,7 +78,6 @@
                 echo "<div id=allHabits>";
                 while ($row = mysqli_fetch_assoc($result)) {
                     array_push($IDArray, $row['id']);
-                    habitExpire($row['id']);
                     if (isset($_POST['changeHabit'])) {
                         $isDone = (isset($_POST["isDone_".$row['id']]) ? '1' : '0');
                         completeTask($isDone,$row['id']);
@@ -108,20 +110,39 @@
             ?>
         </div>
         <div id="group" name="group" class="group" class="aColumn">Group
-            <div id=totalScore> Total score = <?= getInDB("score","user","id" ,$_SESSION["id"])["score"];?> </div>
             <?php 
                 $con = openDB();
-                $groupID = getInDB("groupID","user","id",$_SESSION["id"])["groupID"];
-                if ($groupID != null) {
+                $userInfo = getInDB("groupID, lastConnection","user","id",$_SESSION["id"]);
+                if ($userInfo['groupID'] != null) {
+                    updateGroupScore($userInfo['groupID']);
+                    echo "<div id=totalScore> Total score =".getInDB("score","group","id" ,$userInfo['groupID'])["score"]." </div>";
                     echo "<form method=POST id=invite><input type=submit name=invite value=invite people></form>";
-                    $stmt = $con->prepare("SELECT username FROM user WHERE groupID = ?");
-                    $stmt->bind_param("s",$groupID);
+                    $stmt = $con->prepare("SELECT username, id, lastConnection FROM user WHERE groupID = ?");
+                    $stmt->bind_param("s",$userInfo['groupID']);
                     $stmt->execute();
-                    $result2 = $stmt->get_result();
+                    $result = $stmt->get_result();
                     while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<div>".$row['username']."</div>";
+                        $previousScore = getInDB("score", "score", "userID = $row[id] AND `date`", $userInfo['lastConnection']);
+                        $score = getInDB("score", "score", "userID = $row[id] AND `date`", $date);
+                        if ($previousScore == null) {
+                            $previousScore['score'] = 0;
+                        } if ($score == null) {
+                            $score['score'] =0;
+                        }
+                        $score['score'] = $score['score'] - $previousScore['score'];
+                        $lost = "won";
+                        if ($score['score'] < 0) {
+                            $lost = "lost";
+                            $score['score'] = abs($score['score']);
+                        }
+                        if ($row['username'] == $_SESSION['username']) {
+                            echo "<div> You ".$lost." ".$score['score']." point(s) since last connection</div>";
+                        } else {
+                            echo "<div>".$row['username']." ".$lost." ".$score['score']." point(s) since last connection</div>";
+                        }
                     }
                 } else {
+                        echo "<div id=totalScore> Total score =".getInDB("score","user","id" ,$_SESSION["id"])["score"]." </div>";
                         echo "<form method=POST id=viewInvite><input type=submit name=viewInvite value=invitations></form>";
                         echo "<form method=POST id=createGroup><input type=submit name=createGroup value=Create&nbsp;group></form>";
                 }
