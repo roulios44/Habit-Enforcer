@@ -1,14 +1,9 @@
 <?php require_once "request.php" ;
 class Login extends Request{
     function BeginSignIn(){
-        $username = strip_tags($_POST["username"]);
-        $password = strip_tags($_POST["password"]);
-        if(empty($username) || empty($password)){
-            echo "<p>Please fill all fields please</p><br>";
-        } else {
-            $this->SignIn($username, $password);
+        if(empty($_POST["username"]) || empty($_POST["password"]))echo "<p>Please fill all fields please</p><br>";
+        else $this->SignIn(strip_tags($_POST["username"]), strip_tags($_POST["password"]));
     }
-}
 
 function SignIn(String $username, String $password){
     if (!$this->alreadyExist($username,"user", "username"))echo "This username is unknow of our website, you can create a account with this one";
@@ -26,8 +21,7 @@ function SignIn(String $username, String $password){
 }
 
 function generatePage(){
-    print_r($_SESSION) ;
-    if (is_null($_SESSION["id"])){
+    if (session_status() != PHP_SESSION_ACTIVE){
         echo '
         <div class="form">
         <form action="" method="POST">
