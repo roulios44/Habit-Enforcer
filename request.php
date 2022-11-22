@@ -168,9 +168,13 @@ abstract class Request{
         $stmt->execute();
         mysqli_close($con) ;
         $this->updateGroupMembers($groupID,$userID) ;
+<<<<<<< HEAD
         $this->updateInDB("user","score","0","id",$userID) ;
         $this->deleteTask("userID", $userID);
 
+=======
+        $this->updateInDB("user", "lastAddHabit", "0000-00-00", "id", $userID);
+>>>>>>> DEV
     }
     protected function addNewScore(int $userID) {
         $db = $this->openDB();
