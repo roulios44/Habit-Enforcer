@@ -15,7 +15,7 @@ abstract class Request{
     
     protected function addUserDB(String $username, String $email, String $pwd) {
         $hashPassword = password_hash($pwd,PASSWORD_DEFAULT);
-        $currentDate = date("Y-m-d");
+        $currentDate = date("Ymdhi");
         $con = $this->openDB();
         $stmt = $con->prepare("INSERT INTO user (username, email, password,lastConnection) VALUES (?,?,?,?)");
         $stmt->bind_param("ssss", $username, $email, $hashPassword, $currentDate);
@@ -110,7 +110,7 @@ abstract class Request{
         mysqli_close($db) ;
         $this->addUserGroup($groupID, $ownerID) ;
         $this->deleteTask("userID", $ownerID);
-        $this->resetScore($ownerID);
+        $this->updateInDB("user","score",0,"id",$ownerID);
         return $groupID;
     }
     
@@ -170,31 +170,22 @@ abstract class Request{
         $this->updateGroupMembers($groupID,$userID) ;
         $this->updateInDB("user", "lastAddHabit", "0000-00-00", "id", $userID);
     }
-    protected function updateGroupScore($groupID) {
-        $groupScore = 0;
-        $con = $this->openDB();
-        $sql = $con->prepare("SELECT `score` FROM user WHERE groupID = $groupID");
-        $sql->execute();
-        $result = $sql->get_result();
-        while ($row = mysqli_fetch_assoc($result)) {
-            $groupScore+=$row['score'];
-        }
-        $sql2 = $con->prepare("UPDATE `group` SET score = ? WHERE id = ?");
-        $sql2->bind_param("ss", $groupScore, $groupID);
-        $sql2->execute();
-    }
-    protected function addNewScore($id) {
+    protected function addNewScore(int $userID) {
         $db = $this->openDB();
-        $score = $this->getInDB("score", "user","id", $id);
+        $score = $this->getInDB("score", "user","id", $userID);
         $date = date("Ymdh");
         $stmt = $db->prepare("INSERT INTO score (score, userID, `date`) VALUES (?,?,?)");
-        $stmt->bind_param("sss",$score['score'], $id, $date);
-        $stmt->execute();
+        $stmt->execute([$score['score'],$userID,$date]);
     }
     
     protected function updateGroupMembers(int $groupID, int $userID){
         $groupMember = json_decode($this->getInDB("members","group","id",$groupID)["members"]);
         if (!in_array($userID,$groupMember))array_push($groupMember, $userID);
+        else{
+            $groupMember = array_filter($groupMember, function ($elem) use ($userID) {
+                return $elem != $userID ;
+            }) ;
+        }
         $this->updateInDB("group","members",json_encode($groupMember),"id",$groupID) ;
     }
     
@@ -248,13 +239,14 @@ abstract class Request{
             $this->addNewScore($row['userID']);
         }
     }
+
     
-    protected function resetTime($date, $id) {
+    
+    function resetTime($date) {
         $db = $this->openDB();
-        $stmt = $db->prepare("UPDATE habit SET `start` = ?, isDone = 0 WHERE id = ?");
-        $stmt->bind_param("ss", $date, $id);
+        $stmt = $db->prepare("UPDATE habit SET `start` = ?, isDone = 0");
+        $stmt->bind_param("s", $date);
         $stmt->execute();
-        mysqli_close($db) ;
     }
     protected function updateInDB(string $table, string $rowToUpdate,mixed $newValue, string $tableCondition ,string $condition){
         $db = $this->openDB();
@@ -278,7 +270,7 @@ abstract class Request{
 
     protected function getRankings() {
         $con = $this->openDB();
-        $query = "SELECT `name` FROM `group` ORDER BY score";
+        $query = "SELECT `name` FROM `group` ORDER BY score DESC LIMIT 5";
         $result = mysqli_query($con, $query);
         while ($row = mysqli_fetch_assoc($result)) {
             echo "<div>".$row['name']."</div>";
@@ -290,5 +282,34 @@ abstract class Request{
         $stmt = $db->prepare("DELETE FROM habit WHERE $condition = ?");
         $stmt->bind_param("s", $id);
         $stmt->execute();
+    }
+
+    protected function updateGroupScore(int $groupID) {
+        $groupScore = 0;
+        $con = $this->openDB();
+        $sql = $con->prepare("SELECT `score` FROM user WHERE groupID = $groupID");
+        $sql->execute();
+        $result = $sql->get_result();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $groupScore+=$row['score'];
+        }
+        $this->updateInDB("group","score",$groupScore,"id",$groupID);
+    }
+
+    protected function deleteAccount(int $userID,int $groupID) {
+        if(!is_null($groupID)){
+            $groupOwnerID = $this->getInDB("ownerID", "group","id",$groupID)["ownerID"] ;
+            if($groupOwnerID == $userID)$this->destroyGroup($groupID) ;
+            else $this->updateGroupMembers($groupID,$userID) ;
+        }
+        $this->deleteTask("userID", $userID) ;
+        $this->delete("user","id",$userID) ;
+    }
+
+    protected function delete(string $table, string $rowToSearch,string $condition){
+        $db = $this->openDB();
+        $stmt = $db->prepare("DELETE FROM $table WHERE $rowToSearch = ?");
+        $stmt->execute([$condition]);
+        mysqli_close($db) ;
     }
 }

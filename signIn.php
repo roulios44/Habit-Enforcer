@@ -14,9 +14,7 @@ function SignIn(String $username, String $password){
             $_SESSION["id"] = $this->getInDB("id","user","username",strip_tags($username))["id"];
             $_SESSION["groupID"] = $this->getInDB("groupID","user","id",$_SESSION["id"])["groupID"];
             $this->habitExpire();
-            $userIDs = $this->getInDb("id", "user", "groupID", $_SESSION["groupID"]);
             header('Location: main.php');
-            print_r($userIDs);
         } else {
             echo "<p>Wrong password, try again</p>" ;
         }
@@ -36,7 +34,7 @@ function generatePage(){
         </form>
         </div>
         <div class="connectMessage">
-        <p>No Account? <a href="http://localhost/Habit-Enforcer/register.php">Sign in here</a></p><br>
+        <p>No Account? <a href="http://localhost/habitenforcer/Habit-Enforcer/Register.php">Sign in here</a></p><br>
         </div>
         ' ;
         $this->BeginSignIn();

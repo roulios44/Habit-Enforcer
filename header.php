@@ -1,16 +1,8 @@
-<div class="header">
-    <div class="leftHeader">
-        <p>left Header</p>
-        <div>
-        <form action="main.php">
-            <input type="submit" value="HOME">
-        </form>
-        </div>
-    </div>
-    <div class="rightHeader">
-        <p>right Header</p>
-        
-        <?php
+<?php 
+require_once "request.php" ;
+class Header extends Request{
+
+    public function generateHeader(){
         if (session_status() === PHP_SESSION_ACTIVE){
             echo "<div id=manageAccount>";
             echo "<form method=POST id=deconnexionForm><input type=submit name=deconnect value=Deconnexion></form>";
@@ -19,14 +11,29 @@
         }
         if (isset($_POST["deconnect"]) || isset($_POST["deleteAccount"])) {
             if (isset($_POST["deleteAccount"])) {
-                require_once "request.php";
-                // deleteAccount($_SESSION['id']);
+                $this->deleteAccount($_SESSION['id'],$_SESSION["groupID"]);
+                $this->deleteTask("userID",$_SESSION['id']);
             }
             session_unset();
             session_destroy();
             header('Location: signIn.php');
         }
-        ?>
+    }
+}
+$header = new Header ;
+?>
+<div class="header">
+    <div class="leftHeader">
+        <p>Bonjour   <?php echo $_SESSION["username"] ;?>   </p>
+
+        <div>
+        <form action="main.php">
+            <input type="submit" value="HOME">
+        </form>
+        </div>
+    </div>
+    <div class="rightHeader">        
+        <?php $header->generateHeader() ;?>
     </div>
     <?php 
         
