@@ -3,7 +3,7 @@ require_once "request.php";
 session_start() ;
 class Register extends Request {
     public function generatePage(){
-        if (!is_null($_SESSION["id"])){
+        if (session_status() === PHP_SESSION_ACTIVE){
            header('Location: main.php') ;
         } else {
             echo "
@@ -24,10 +24,7 @@ class Register extends Request {
     }
     
     public function beginRegister(){
-        $username = strip_tags($_POST["username"]);
-        $password = strip_tags($_POST["password"]);
-        $mail = strip_tags($_POST["mail"]);
-        if(empty($username) || empty($password) || empty($mail)){
+        if(empty($_POST["username"]) || empty($_POST["password"]) || empty($_POST["mail"])){
             echo "<p>Please fill all fields please</p><br>";
         } else {
             $this->register();
@@ -59,7 +56,6 @@ class Register extends Request {
 <html lang="en">
 <?php include "head.php" ;?>
 <body>
-    <?php include "header.php"?>
     <?php 
     $register = new Register;
     $register->generatePage() ;
