@@ -81,6 +81,7 @@ class mainPage extends Request{
             $totalGroupScore = $this->getInDB("score","group","id" ,$userInfo['groupID'])['score'];
             if ($totalGroupScore <0) {
                 $this->destroyGroup($userInfo['groupID']);
+                $_SESSION["groupID"] = null;
                 header('Location: main.php');
             }
             echo "<div id=totalScore> Total score =".$totalGroupScore." </div>";
