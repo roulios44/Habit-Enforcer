@@ -25,7 +25,7 @@ abstract class Request{
     
     protected function refreshLastConnection(int $userID) {
         $con = $this->openDB();
-        $currentDate = date("Ymdhi");
+        $currentDate = date("Ymdh");
         $stmt = $con->prepare("UPDATE user SET lastConnection = ? WHERE id = ?");
         $stmt->bind_param("ss", $currentDate, $userID);
         $stmt->execute();
@@ -126,7 +126,6 @@ abstract class Request{
             $score = $this->defineScoreUpdate($done, $row['difficulty'],"instantManaging");
             $currentScore = $this->getInDB("score", "user","id",$row['userID'])["score"] ;
             $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
-            $this->addNewScore($row['userID']);
         }
         mysqli_close($con) ;
     }
@@ -186,7 +185,7 @@ abstract class Request{
     protected function addNewScore($id) {
         $db = $this->openDB();
         $score = $this->getInDB("score", "user","id", $id);
-        $date = date("Ymdhi");
+        $date = date("Ymdh");
         $stmt = $db->prepare("INSERT INTO score (score, userID, `date`) VALUES (?,?,?)");
         $stmt->bind_param("sss",$score['score'], $id, $date);
         $stmt->execute();
@@ -207,7 +206,7 @@ abstract class Request{
         mysqli_close($db);
         return mysqli_fetch_assoc($resultQuery);
     }
-    protected function getInDB(string $toSelect, string $table, string $rowToSearch, string|int $condition){
+    protected function getInDB(string $toSelect, string $table, string $rowToSearch, string|int|null $condition){
         $db = $this->openDB();
         $sql = $db->prepare("SELECT $toSelect FROM `$table` WHERE $rowToSearch = ?");
         $sql->bind_param("s", $condition);
@@ -227,25 +226,25 @@ abstract class Request{
         }
     }
 
-    protected function habitExpire(int $id) {
+    protected function habitExpire() {
         $db = $this->openDB();
-        $stmt = $db->prepare("SELECT `start`, `time`, isDone, difficulty, userID FROM habit WHERE id = ?");
-        $stmt->bind_param("s",$id);
+        $stmt = $db->prepare("SELECT `start`, `time`, isDone, difficulty, userID FROM habit");
         $stmt->execute();
         $resultQuery = $stmt->get_result();
-        $row = $resultQuery->fetch_assoc();
         $date = date("Y-m-d");
-        $habitDate = $row['start'];
-        $nbDaysBetween = (strtotime($date)-strtotime($habitDate))/86400;
-        echo $nbDaysBetween;
-        if (($row['time']=="daily" && $nbDaysBetween >= 1) ||($row['time']=="weekly" && $nbDaysBetween >= 7)) {
-            if ($row['isDone'] == 0) {
-                $score = $this->defineScoreUpdate($row['isDone'], $row['difficulty'], "withTimeManaging")*$nbDaysBetween;
-                $currentScore = $this->getInDB("score","user","id",$row["userID"])["score"] ;
-                $this->updateInDB("user","score",$currentScore + $score,"id",$row["userID"]) ;
-                $this->addNewScore($row['userID']);
+        while ($row = mysqli_fetch_assoc($resultQuery)) {
+            $habitDate = $row['start'];
+            $nbDaysBetween = (strtotime($date)-strtotime($habitDate))/86400;
+            if (($row['time']=="daily" && $nbDaysBetween >= 1) ||($row['time']=="weekly" && $nbDaysBetween >= 7)) {
+                if ($row['isDone'] == 0) {
+                    $score = $this->defineScoreUpdate($row['isDone'], $row['difficulty'], "withTimeManaging")*$nbDaysBetween;
+                    $stmt = $db->prepare("UPDATE user SET score = score+? WHERE id = ?");
+                    $stmt->bind_param("ss",$score, $row['userID']);
+                    $stmt->execute();
+                }
+                $this->resetTime($date, $row['userID']);
             }
-            $this->resetTime($date, $id);
+            $this->addNewScore($row['userID']);
         }
     }
     
@@ -257,7 +256,6 @@ abstract class Request{
         mysqli_close($db) ;
     }
     protected function updateInDB(string $table, string $rowToUpdate,mixed $newValue, string $tableCondition ,string $condition){
-        echo gettype($newValue) ;
         $db = $this->openDB();
         $sql = $db->prepare("UPDATE `$table` SET `$rowToUpdate` = ? WHERE $tableCondition = ?");
         $sql->execute([$newValue,$condition]);
@@ -266,7 +264,6 @@ abstract class Request{
     
     protected function destroyGroup(int $groupID){
         $members = json_decode($this->getInDB("members", "group","id", $groupID)["members"]) ;
-        echo $members;
         foreach($members as $memberID){
             $this->updateInDB("user","groupID",NULL,"id",$memberID);
             $this->deleteTask("userID",$memberID);

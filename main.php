@@ -41,11 +41,9 @@ class mainPage extends Request{
         $con = $this->openDB();
         $query = "SELECT description, id, color FROM habit WHERE userID = $_SESSION[id] ORDER BY color";
         $result = mysqli_query($con, $query);
-        $nbRows = mysqli_num_rows($result);
         echo "<form id=sendDone method=post>";
         echo "<div id=allHabits>";
         while ($row = mysqli_fetch_assoc($result)) {
-            $this->habitExpire($row['id']);
             if (isset($_POST['changeHabit'])) {
                 $isDone = (isset($_POST["isDone_".$row['id']]) ? '1' : '0');
                 $this->completeTask($isDone,$row['id']);
@@ -82,6 +80,7 @@ class mainPage extends Request{
             $totalGroupScore = $this->getInDB("score","group","id" ,$userInfo['groupID'])['score'];
             if ($totalGroupScore <0) {
                 $this->destroyGroup($userInfo['groupID']);
+                header('Location: main.php');
             }
             echo "<div id=totalScore> Total score =".$totalGroupScore." </div>";
             echo "<form method=POST id=invite><input type=submit name=invite value=invite people></form>";
@@ -90,13 +89,10 @@ class mainPage extends Request{
             $stmt->execute();
             $result = $stmt->get_result();
             while ($row = mysqli_fetch_assoc($result)) {
-                $date = date("Ymdh");
                 $previousScore = $this->getInDB("score", "score", "userID = $row[id] AND `date`", $userInfo['lastConnection']);
-                $score = $this->getInDB("score", "score", "userID = $row[id] AND `date`", $date);
+                $score = $this->getInDB("score", "user", "id", $row["id"]);
                 if ($previousScore == null) {
                     $previousScore['score'] = 0;
-                } if ($score == null) {
-                    $score['score'] =0;
                 }
                 $score['score'] = $score['score'] - $previousScore['score'];
                 $lost = "won";
@@ -110,6 +106,7 @@ class mainPage extends Request{
                     echo "<div>".$row['username']." ".$lost." ".$score['score']." point(s) since last connection</div>";
                 }
             }
+            $this->refreshLastConnection($_SESSION['id']);
         } else {
                 echo "<div id=totalScore> Total score =".$this->getInDB("score","user","id" ,$_SESSION["id"])["score"]." </div>";
                 echo "<form method=POST id=viewInvite><input type=submit name=viewInvite value=invitations></form>";

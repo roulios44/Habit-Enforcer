@@ -12,8 +12,11 @@ function SignIn(String $username, String $password){
             session_start();
             $_SESSION["username"] = strip_tags($username) ;
             $_SESSION["id"] = $this->getInDB("id","user","username",strip_tags($username))["id"];
-            $_SESSION["groupID"] = $this->getInDB("groupID","user","id",$_SESSION["id"])["groupID"] ;
+            $_SESSION["groupID"] = $this->getInDB("groupID","user","id",$_SESSION["id"])["groupID"];
+            $this->habitExpire();
+            $userIDs = $this->getInDb("id", "user", "groupID", $_SESSION["groupID"]);
             header('Location: main.php');
+            print_r($userIDs);
         } else {
             echo "<p>Wrong password, try again</p>" ;
         }
